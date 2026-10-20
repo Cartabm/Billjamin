@@ -1,0 +1,518 @@
+[gd_scene format=3 uid="uid://5sgy0k2htp7b"]
+
+[ext_resource type="Script" uid="uid://beta1agqrslpv" path="res://player.gd" id="1_4flbx"]
+[ext_resource type="PackedScene" uid="uid://dsf83v0tmmvtx" path="res://Assets/Models/Blake.glb" id="2_onrkg"]
+[ext_resource type="Texture2D" uid="uid://dhhpakt24xpdl" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Attack03.png" id="3_b26j0"]
+[ext_resource type="Texture2D" uid="uid://ctp02arto5rfy" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Death.png" id="4_n7ghd"]
+[ext_resource type="Texture2D" uid="uid://523vxbnpvu5f" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Hurt.png" id="5_nvl01"]
+[ext_resource type="Texture2D" uid="uid://cc3v6q5inpph3" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Attack02.png" id="6_ivps1"]
+[ext_resource type="Texture2D" uid="uid://cib7hwvqdihia" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Attack01.png" id="7_urp6f"]
+[ext_resource type="Texture2D" uid="uid://q4aatjj2inll" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Walk.png" id="8_bwjto"]
+[ext_resource type="Texture2D" uid="uid://d063xbgvbm7wx" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Idle.png" id="9_606se"]
+[ext_resource type="PackedScene" uid="uid://g5vc38me68xs" path="res://Archer.tscn" id="10_n7ghd"]
+[ext_resource type="AudioStream" uid="uid://bxkd6o06n8jy0" path="res://Assets/Audio/Bow_Release.wav" id="11_nvl01"]
+[ext_resource type="AudioStream" uid="uid://bm0amoqkwm7wi" path="res://Assets/Audio/Player_Hurt.wav" id="12_ivps1"]
+[ext_resource type="AudioStream" uid="uid://beabnivjm7obb" path="res://Assets/Audio/Death.wav" id="13_urp6f"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ap0u0"]
+radius = 0.4
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u1c27"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_op7ga"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q13i1"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pylmc"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pbfsw"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5tmop"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(500, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ahtn"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(600, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7lmhl"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(700, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dx0e4"]
+atlas = ExtResource("3_b26j0")
+region = Rect2(800, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jm5j8"]
+atlas = ExtResource("4_n7ghd")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7hik5"]
+atlas = ExtResource("4_n7ghd")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qtqh7"]
+atlas = ExtResource("4_n7ghd")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2wuci"]
+atlas = ExtResource("4_n7ghd")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iruf7"]
+atlas = ExtResource("5_nvl01")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j5n4i"]
+atlas = ExtResource("5_nvl01")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_634y6"]
+atlas = ExtResource("5_nvl01")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_efrwb"]
+atlas = ExtResource("5_nvl01")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hiqhm"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tkwlq"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hl5qd"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ek41f"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_khis8"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b88wv"]
+atlas = ExtResource("6_ivps1")
+region = Rect2(500, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pgbbb"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_331ug"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ny14h"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ibah8"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3iwfv"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qwsg1"]
+atlas = ExtResource("7_urp6f")
+region = Rect2(500, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1xqrm"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bfour"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8gr2b"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vl8ci"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ieltc"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fddr8"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(500, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oybyf"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(600, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ajfva"]
+atlas = ExtResource("8_bwjto")
+region = Rect2(700, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5ef02"]
+atlas = ExtResource("9_606se")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pfmca"]
+atlas = ExtResource("9_606se")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_76oay"]
+atlas = ExtResource("9_606se")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b4uyv"]
+atlas = ExtResource("9_606se")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tw8ou"]
+atlas = ExtResource("9_606se")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ygbnx"]
+atlas = ExtResource("9_606se")
+region = Rect2(500, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ek0cf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u1c27")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_op7ga")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q13i1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pylmc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pbfsw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5tmop")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ahtn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7lmhl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dx0e4")
+}],
+"loop": 1,
+"name": &"Bow",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jm5j8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7hik5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qtqh7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2wuci")
+}],
+"loop": 1,
+"name": &"Death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iruf7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j5n4i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_634y6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_efrwb")
+}],
+"loop": 1,
+"name": &"Hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hiqhm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tkwlq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hl5qd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ek41f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_khis8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b88wv")
+}],
+"loop": 1,
+"name": &"Slam",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pgbbb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_331ug")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ny14h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ibah8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3iwfv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qwsg1")
+}],
+"loop": 1,
+"name": &"Slash",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1xqrm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bfour")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8gr2b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vl8ci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ieltc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fddr8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oybyf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ajfva")
+}],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5ef02")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pfmca")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_76oay")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b4uyv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tw8ou")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ygbnx")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 8.0
+}]
+
+[node name="Player" type="CharacterBody3D" unique_id=2007028265 node_paths=PackedStringArray("archer_animation_player", "archer_visual")]
+transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 0, 0)
+collision_mask = 3
+script = ExtResource("1_4flbx")
+auto_fire_enabled = true
+Auto_fire_range = 20.0
+use_archer_animations = true
+archer_animation_player = NodePath("Billjamin_Archer_V5/AnimationPlayer")
+archer_visual = NodePath("Billjamin_Archer_V5")
+face_camera_direction = true
+health_bar_screen_offset = Vector2(0, 400)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1365250180]
+visible = false
+mesh = SubResource("CapsuleMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=806273573]
+transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_ap0u0")
+
+[node name="Blake" parent="." unique_id=717028763 instance=ExtResource("2_onrkg")]
+visible = false
+
+[node name="Skeleton3D" parent="Blake/armature" parent_id_path=PackedInt32Array(717028763, 538892992) index="0" unique_id=1213477892]
+bones/1/position = Vector3(-4.54983e-25, 0.8248948, -0.056191258)
+bones/1/rotation = Quaternion(-0.060664535, -2.1164222e-18, -2.1164235e-18, 0.9981582)
+bones/2/rotation = Quaternion(-0.06837053, 1.1789209e-07, -9.323026e-09, 0.99766)
+bones/3/rotation = Quaternion(0.12252843, -1.18311064e-07, 1.429201e-08, 0.992465)
+bones/4/rotation = Quaternion(-6.333352e-09, 0.9960995, 0.088238396, -7.635459e-08)
+bones/5/rotation = Quaternion(-0.5154197, 0.39336833, 0.5875894, 0.48408952)
+bones/6/rotation = Quaternion(-0.32217267, 0.028479833, 0.083325356, 0.94257665)
+bones/7/rotation = Quaternion(0.048412267, 0.0023212463, -0.19259031, 0.98008156)
+bones/8/rotation = Quaternion(-0.047598638, -0.028974893, -0.045304805, 0.9974178)
+bones/9/rotation = Quaternion(-0.040122494, -0.6964562, 0.044276442, 0.7151074)
+bones/10/rotation = Quaternion(-0.03363094, -0.0012279686, 0.1757477, 0.98385984)
+bones/11/rotation = Quaternion(-0.006538498, -4.5438668e-07, 0.030773124, 0.99950504)
+bones/12/rotation = Quaternion(-0.05331637, -0.71472585, -0.033437606, 0.69656754)
+bones/13/rotation = Quaternion(0.022155015, 0.007979791, 0.20345269, 0.9788016)
+bones/14/rotation = Quaternion(-0.004823566, -0.0038485052, 0.14754225, 0.98903656)
+bones/15/rotation = Quaternion(-0.016184207, -0.689812, 0.065420635, 0.7208451)
+bones/16/rotation = Quaternion(0.022543218, 0.003154749, 0.168562, 0.9854282)
+bones/17/rotation = Quaternion(-0.009129801, 1.6824177e-06, 0.058331683, 0.99825555)
+bones/18/rotation = Quaternion(-0.023186121, -0.68168247, 0.091274746, 0.7255621)
+bones/19/rotation = Quaternion(0.030869689, 0.0010533256, 0.12925415, 0.99113035)
+bones/20/rotation = Quaternion(-0.0153110465, -2.0813834e-06, 0.10243856, 0.9946215)
+bones/21/rotation = Quaternion(-0.41277316, -0.7088193, -0.0069254315, 0.5719664)
+bones/22/rotation = Quaternion(0.091337636, -0.00065086543, -0.018726543, 0.99564373)
+bones/23/rotation = Quaternion(0.06691924, -0.0047471393, 0.0029511743, 0.9977428)
+bones/24/rotation = Quaternion(0.5154198, 0.39336833, 0.58758944, -0.48408937)
+bones/25/rotation = Quaternion(-0.32217214, -0.028480308, -0.08332528, 0.9425767)
+bones/26/rotation = Quaternion(0.04841096, -0.0023199879, 0.19259048, 0.9800816)
+bones/27/rotation = Quaternion(-0.047597956, 0.028973985, 0.045304623, 0.9974179)
+bones/28/rotation = Quaternion(-0.04012274, 0.6964565, -0.044276424, 0.7151072)
+bones/29/rotation = Quaternion(-0.033631023, 0.0012277409, -0.17574751, 0.9838599)
+bones/30/rotation = Quaternion(-0.0065382062, 7.21125e-07, -0.030773384, 0.9995051)
+bones/31/rotation = Quaternion(-0.053316437, 0.71472543, 0.033438068, 0.6965679)
+bones/32/rotation = Quaternion(0.022154657, -0.0079827355, -0.2034507, 0.97880197)
+bones/33/rotation = Quaternion(-0.004823846, 0.0038528545, -0.14754553, 0.989036)
+bones/34/rotation = Quaternion(-0.016184902, 0.6898126, -0.06542099, 0.72084445)
+bones/35/rotation = Quaternion(0.022542657, -0.0031555064, -0.16856106, 0.98542845)
+bones/36/rotation = Quaternion(-0.00912888, -1.5336597e-06, -0.058331933, 0.99825555)
+bones/37/rotation = Quaternion(-0.023186553, 0.68168277, -0.09127481, 0.7255618)
+bones/38/rotation = Quaternion(0.03087002, -0.0010530873, -0.12925436, 0.9911303)
+bones/39/rotation = Quaternion(-0.015311003, 2.7396613e-06, -0.102439135, 0.99462146)
+bones/40/rotation = Quaternion(-0.41277322, 0.70881927, 0.0069253137, 0.5719664)
+bones/41/rotation = Quaternion(0.09133835, 0.0006510774, 0.018726433, 0.9956437)
+bones/42/rotation = Quaternion(0.066919275, 0.0047447504, -0.0029500327, 0.9977428)
+bones/43/rotation = Quaternion(-0.09027226, -1.48778e-07, -1.1262281e-09, 0.99591714)
+bones/44/rotation = Quaternion(0.12385404, -1.1829143e-07, -3.3465998e-08, 0.99230045)
+bones/45/position = Vector3(-1.597638e-08, 0.0266588, -0.04102676)
+bones/45/rotation = Quaternion(0.8683838, 5.9115113e-08, -4.4168067e-07, -0.4958926)
+bones/46/position = Vector3(0.00025684608, 0.069095485, 0.01191028)
+bones/46/rotation = Quaternion(0.86037356, 0.01267405, 0.0034507182, 0.5094948)
+bones/47/position = Vector3(-0.022128718, 0.013936458, 0.012758091)
+bones/47/rotation = Quaternion(-0.08205819, 0.7455381, 0.59648305, 0.28574014)
+bones/47/scale = Vector3(0.57167315, 0.5716729, 0.57167304)
+bones/48/position = Vector3(0.01943324, 0.013350703, 0.009788763)
+bones/48/rotation = Quaternion(0.18711928, 0.6990352, 0.6316109, -0.27821574)
+bones/48/scale = Vector3(0.6619436, 0.65328574, 0.6779055)
+bones/50/rotation = Quaternion(-0.112421155, -0.043736424, 0.9738075, -0.19273745)
+bones/51/rotation = Quaternion(0.9957885, 2.1433019e-08, -6.2480404e-07, -0.09167994)
+bones/52/position = Vector3(-0.0001518852, 0.11225114, -0.002348405)
+bones/53/position = Vector3(-0.014901223, 0.012708717, -0.010085906)
+bones/53/rotation = Quaternion(-0.7630987, 0.22294343, 0.32097825, 0.51473254)
+bones/53/scale = Vector3(0.57167333, 0.5716734, 0.5716732)
+bones/54/position = Vector3(0.014123758, 0.011601927, -0.008359647)
+bones/54/rotation = Quaternion(-0.7251988, -0.293822, -0.25050607, 0.57008946)
+bones/54/scale = Vector3(0.6541474, 0.6601564, 0.6773489)
+bones/55/rotation = Quaternion(-0.66185087, 0.05622123, 0.12161649, 0.73756504)
+bones/56/rotation = Quaternion(-0.66978604, 0.11614957, 0.06438359, 0.7305825)
+bones/57/rotation = Quaternion(-0.50692356, -0.034945678, 0.02232921, 0.86099297)
+bones/58/position = Vector3(0.034657475, 0.09527852, -0.062074967)
+bones/58/rotation = Quaternion(-0.5069236, 0.034946293, -0.022329263, 0.86099285)
+bones/59/rotation = Quaternion(-0.754905, -0.026397863, 0.032498643, 0.6544964)
+bones/60/position = Vector3(0.03465744, 0.09488891, -0.061889935)
+bones/60/rotation = Quaternion(-0.75490505, 0.026397785, -0.032498106, 0.6544963)
+bones/61/position = Vector3(-0.013296099, 0.11250719, -0.10376819)
+bones/61/rotation = Quaternion(-0.1668515, 0.47661734, 0.60608876, 0.6145348)
+bones/63/position = Vector3(0.012701633, 0.120901525, -0.103158906)
+bones/63/rotation = Quaternion(-0.1877683, -0.45238557, -0.6528307, 0.5778429)
+bones/65/rotation = Quaternion(0.70172644, 0.003870606, 0.7080778, 0.078682154)
+bones/67/rotation = Quaternion(-0.7017278, 0.003870423, 0.70807624, -0.07868427)
+bones/70/position = Vector3(-0.10897142, 0.09960826, -0.0127972355)
+bones/70/rotation = Quaternion(-0.00012332255, -0.02564554, 0.99957377, -0.013949)
+bones/71/rotation = Quaternion(0.013811599, 0.9921901, -0.12395224, -0.001955673)
+bones/72/rotation = Quaternion(-1.4861664e-06, 0.75031453, -0.661081, -1.0072563e-06)
+bones/73/rotation = Quaternion(0.13072152, -5.1039033e-06, -8.73495e-07, 0.99141914)
+bones/74/position = Vector3(0.10897142, 0.09960826, -0.0127972355)
+bones/74/rotation = Quaternion(0.0001233226, -0.02564554, 0.99957377, 0.013949)
+bones/75/rotation = Quaternion(-0.013811599, 0.9921901, -0.12395224, 0.001955673)
+bones/76/rotation = Quaternion(1.4861724e-06, 0.75031453, -0.661081, 1.0072745e-06)
+bones/77/rotation = Quaternion(0.13072152, 5.1039037e-06, 8.7349514e-07, 0.99141914)
+
+[node name="hand_R" parent="Blake/armature/Skeleton3D" index="0" unique_id=249771929]
+transform = Transform3D(-0.16565639, -0.60323226, -0.78017265, -0.25087458, -0.7392999, 0.6248982, -0.9537399, 0.29924378, -0.028865766, -0.5652203, 1.0856767, -0.05564128)
+
+[node name="mock_gun" parent="Blake/armature/Skeleton3D/hand_R" index="0" unique_id=1717597641]
+transform = Transform3D(0.026990341, -0.9924866, -0.11934227, -0.30966762, -0.12181427, 0.94300973, -0.95046234, 0.011504266, -0.3106285, 1.4977542, -0.33035168, 0.045629095)
+
+[node name="MuzzlePoint" type="Marker3D" parent="Blake/armature/Skeleton3D/hand_R" index="1" unique_id=1720338872]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Blake" unique_id=1693407109]
+
+[node name="PlayerLight" type="OmniLight3D" parent="." unique_id=1657920207]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+light_energy = 1.5
+shadow_enabled = true
+omni_range = 15.0
+
+[node name="CharacterSprite" type="AnimatedSprite3D" parent="." unique_id=856045907]
+transform = Transform3D(5.5, -5.551115e-17, 0, -1.0863706e-16, 5.5, -2.220446e-16, 4.440892e-16, 0, 5.5, -6.938894e-18, 0.5, 0)
+visible = false
+billboard = 1
+sprite_frames = SubResource("SpriteFrames_ek0cf")
+animation = &"Walk"
+frame_progress = 0.6809811
+
+[node name="Billjamin_Archer_V5" parent="." unique_id=372439789 instance=ExtResource("10_n7ghd")]
+
+[node name="Skeleton3D" parent="Billjamin_Archer_V5" index="0" unique_id=1977351296]
+bones/3/rotation = Quaternion(0, 0, 0.41469324, 0.9099613)
+bones/6/rotation = Quaternion(0, 0, -0.41469324, 0.9099613)
+
+[node name="BowSound" type="AudioStreamPlayer3D" parent="." unique_id=1309762410]
+stream = ExtResource("11_nvl01")
+volume_db = -15.0
+
+[node name="HurtSound" type="AudioStreamPlayer3D" parent="." unique_id=647302119]
+stream = ExtResource("12_ivps1")
+volume_db = -5.0
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="." unique_id=1500348954]
+stream = ExtResource("13_urp6f")
+
+[editable path="Blake"]
+[editable path="Billjamin_Archer_V5"]

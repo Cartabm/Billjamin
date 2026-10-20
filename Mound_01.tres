@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://j88shi324uja"]
+
+[ext_resource type="Texture2D" uid="uid://p2nuq01cegnd" path="res://Assets/SlavicWorldFree/Textures/Pobbles_Sand_Dirt.png" id="1_v4oin"]
+
+[resource]
+albedo_texture = ExtResource("1_v4oin")
+uv1_triplanar = true

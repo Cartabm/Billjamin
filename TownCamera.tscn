@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dyfv5ysxlde2i"]
+
+[ext_resource type="Script" uid="uid://ch62mujp2a1ui" path="res://camera_follow.gd" id="1_w18ns"]
+
+[node name="Camera3D" type="Camera3D" unique_id=1100074316]
+transform = Transform3D(1.0000001, -3.259629e-09, 1.4901161e-08, -3.2014214e-10, 0.7071069, 0.7071068, 9.313226e-10, -0.70710677, 0.7071068, 0, 0, 0)
+current = true
+fov = 50.0
+size = 20.0
+script = ExtResource("1_w18ns")

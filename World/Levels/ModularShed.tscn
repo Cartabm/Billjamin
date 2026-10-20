@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://bjots2u3kj5qw"]
+
+[ext_resource type="Script" uid="uid://qa0qq8gm8bhh" path="res://World/measure_model.gd" id="1_lpapy"]
+[ext_resource type="PackedScene" uid="uid://8c2t4s3wwfue" path="res://Assets/Models/Environment/FantasyTown/GLB format/wall-wood-corner.glb" id="2_nuh3c"]
+[ext_resource type="PackedScene" uid="uid://djod8b85fgskw" path="res://Assets/Models/Environment/FantasyTown/GLB format/wall-wood-doorway-round.glb" id="3_gnq6r"]
+[ext_resource type="PackedScene" uid="uid://by3t4rmrmtxa4" path="res://Assets/Models/Environment/FantasyTown/GLB format/wall-door.glb" id="3_mweh2"]
+[ext_resource type="PackedScene" uid="uid://cwobxhr5xgy32" path="res://Assets/Models/Environment/FantasyTown/GLB format/wall-wood.glb" id="4_3m1qq"]
+[ext_resource type="PackedScene" uid="uid://dq8n6410krki5" path="res://Assets/Models/Environment/FantasyTown/GLB format/roof.glb" id="5_nuh3c"]
+[ext_resource type="PackedScene" uid="uid://c4assjxtafr23" path="res://Assets/Models/Environment/FantasyTown/GLB format/wall-half.glb" id="7_n8i87"]
+[ext_resource type="PackedScene" uid="uid://ckudqyje1n2sy" path="res://Assets/Models/Environment/FantasyTown/GLB format/roof-high-flat.glb" id="8_r8w6u"]
+[ext_resource type="Script" uid="uid://dgffiv0y3uli0" path="res://World/Levels/interior_trigger.gd" id="9_n8i87"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n8i87"]
+size = Vector3(0.15, 1, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r8w6u"]
+size = Vector3(0.15, 1, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1cia8"]
+size = Vector3(0.15, 1, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j4oks"]
+size = Vector3(0.15, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ek0cf"]
+size = Vector3(0.15, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(2.5, 1.5, 2.5)
+
+[node name="ModularShed" type="Node3D" unique_id=2003431548]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+script = ExtResource("1_lpapy")
+
+[node name="wall-wood-corner3" parent="." unique_id=1678531781 instance=ExtResource("2_nuh3c")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3, 0, -1)
+
+[node name="wall-wood-doorway-round2" parent="." unique_id=325659568 instance=ExtResource("3_gnq6r")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 1, 0, 0)
+
+[node name="wall-door2" parent="." unique_id=1698495553 instance=ExtResource("3_mweh2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0, 0)
+visible = false
+
+[node name="wall-wood5" parent="." unique_id=1428353821 instance=ExtResource("4_3m1qq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
+
+[node name="wall-wood6" parent="." unique_id=1621515638 instance=ExtResource("4_3m1qq")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 2, 0, 1)
+
+[node name="wall-wood8" parent="." unique_id=1892544083 instance=ExtResource("4_3m1qq")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0, -1)
+
+[node name="wall-wood-corner2" parent="." unique_id=772293931 instance=ExtResource("2_nuh3c")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 1, 0, 1)
+
+[node name="wall-wood-corner4" parent="." unique_id=1185004655 instance=ExtResource("2_nuh3c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+
+[node name="wall-wood-corner5" parent="." unique_id=528706738 instance=ExtResource("2_nuh3c")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 1, 0, -1)
+
+[node name="Roof" type="Node3D" parent="." unique_id=2142779802]
+
+[node name="RoofTest" parent="Roof" unique_id=517857526 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1, 1, 1)
+script = ExtResource("1_lpapy")
+
+[node name="RoofTest4" parent="Roof" unique_id=2083011701 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 1, 1, -1)
+script = ExtResource("1_lpapy")
+
+[node name="RoofTest6" parent="Roof" unique_id=1096452920 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 3, 1, -1)
+script = ExtResource("1_lpapy")
+
+[node name="RoofTest5" parent="Roof" unique_id=1955209010 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 2, 1, -1)
+script = ExtResource("1_lpapy")
+
+[node name="RoofTest2" parent="Roof" unique_id=1657041847 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 1, 1)
+script = ExtResource("1_lpapy")
+
+[node name="RoofTest3" parent="Roof" unique_id=811168217 instance=ExtResource("5_nuh3c")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3, 1, 1)
+script = ExtResource("1_lpapy")
+
+[node name="wall-half2" parent="Roof" unique_id=700918065 instance=ExtResource("7_n8i87")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 1, 1, 0)
+
+[node name="wall-half3" parent="Roof" unique_id=379201718 instance=ExtResource("7_n8i87")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 0)
+
+[node name="roof-high-flat2" parent="Roof" unique_id=698407656 instance=ExtResource("8_r8w6u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, 0)
+
+[node name="roof-high-flat3" parent="Roof" unique_id=1274332390 instance=ExtResource("8_r8w6u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 0)
+
+[node name="roof-high-flat4" parent="Roof" unique_id=1465072733 instance=ExtResource("8_r8w6u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 0)
+
+[node name="WallCollision" type="StaticBody3D" parent="." unique_id=2013836994]
+
+[node name="RightWallCollision" type="CollisionShape3D" parent="WallCollision" unique_id=211064298]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0.5, 1.5)
+shape = SubResource("BoxShape3D_n8i87")
+
+[node name="BackWallCollision" type="CollisionShape3D" parent="WallCollision" unique_id=1314129098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.45, 0.5, 0)
+shape = SubResource("BoxShape3D_r8w6u")
+
+[node name="LeftWallCollision" type="CollisionShape3D" parent="WallCollision" unique_id=2142680786]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 0.5, -1.5)
+shape = SubResource("BoxShape3D_1cia8")
+
+[node name="FrontWallRightCollision" type="CollisionShape3D" parent="WallCollision" unique_id=483652196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -1)
+shape = SubResource("BoxShape3D_j4oks")
+
+[node name="FrontWallRightCollision2" type="CollisionShape3D" parent="WallCollision" unique_id=625833009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 1)
+shape = SubResource("BoxShape3D_ek0cf")
+
+[node name="InteriorTrigger" type="Area3D" parent="." unique_id=1951487023]
+collision_layer = 0
+script = ExtResource("9_n8i87")
+
+[node name="InteriorShape" type="CollisionShape3D" parent="InteriorTrigger" unique_id=741216458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.75, 0)
+shape = SubResource("BoxShape3D_ap0u0")

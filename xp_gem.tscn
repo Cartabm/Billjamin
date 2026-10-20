@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ba5o65gi42j3k"]
+
+[ext_resource type="Script" uid="uid://dxtwymq7ba7ef" path="res://xp_gem.gd" id="1_1yue2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_prtu8"]
+albedo_color = Color(0.73483235, 0.32487056, 0.7754614, 1)
+metallic = 0.25
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.09305123, 0.6815083, 0.8423071, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_4gyqm"]
+radius = 0.15
+height = 0.1
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ek0cf"]
+radius = 2.0
+
+[node name="XpGem" type="Area3D" unique_id=881911449]
+script = ExtResource("1_1yue2")
+
+[node name="GemVisual" type="Node3D" parent="." unique_id=943358004]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="GemVisual" unique_id=2014661870]
+material_override = SubResource("StandardMaterial3D_prtu8")
+mesh = SubResource("SphereMesh_4gyqm")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=930044038]
+shape = SubResource("SphereShape3D_ek0cf")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=368360604]
+visible = false

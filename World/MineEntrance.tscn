@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://crbn6u7yg5lyx"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(0.5, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ap0u0"]
+size = Vector3(0.5, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_prtu8"]
+size = Vector3(5.5, 0.6, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ptp84"]
+albedo_color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jni1y"]
+size = Vector3(5, 0.3, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n7y2e"]
+albedo_color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_oomdq"]
+size = Vector3(0.6, 4, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hieja"]
+albedo_color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xhjmr"]
+size = Vector3(0.4, 4, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_umb2s"]
+albedo_color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nkyw0"]
+size = Vector3(6.2, 0.6, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gdydc"]
+albedo_color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_n7y2e"]
+size = Vector3(5.5, 4.5, 0.3)
+
+[node name="MineEntrance" type="Node3D" unique_id=1100527308]
+
+[node name="EntranceFrame" type="Node3D" parent="." unique_id=614604829]
+
+[node name="LeftPost" type="MeshInstance3D" parent="EntranceFrame" unique_id=1600818831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2, 0)
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="RightPost" type="MeshInstance3D" parent="EntranceFrame" unique_id=428560824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2, 0)
+mesh = SubResource("BoxMesh_ap0u0")
+
+[node name="TopBeam" type="MeshInstance3D" parent="EntranceFrame" unique_id=451517849]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+mesh = SubResource("BoxMesh_prtu8")
+
+[node name="TunnelVisual" type="Node3D" parent="." unique_id=1021632700]
+
+[node name="TunnelFloor" type="MeshInstance3D" parent="TunnelVisual" unique_id=500678642]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, -4)
+material_override = SubResource("StandardMaterial3D_ptp84")
+mesh = SubResource("BoxMesh_jni1y")
+
+[node name="LeftTunnelWall" type="MeshInstance3D" parent="TunnelVisual" unique_id=824126899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 2, -4)
+material_override = SubResource("StandardMaterial3D_n7y2e")
+mesh = SubResource("BoxMesh_oomdq")
+
+[node name="RightTunnelWall" type="MeshInstance3D" parent="TunnelVisual" unique_id=30080041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 2, -4)
+material_override = SubResource("StandardMaterial3D_hieja")
+mesh = SubResource("BoxMesh_xhjmr")
+
+[node name="TunnelCeiling" type="MeshInstance3D" parent="TunnelVisual" unique_id=1181558165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.3, -4)
+material_override = SubResource("StandardMaterial3D_umb2s")
+mesh = SubResource("BoxMesh_nkyw0")
+
+[node name="TunnelBack" type="MeshInstance3D" parent="TunnelVisual" unique_id=1274901739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -8)
+material_override = SubResource("StandardMaterial3D_gdydc")
+mesh = SubResource("BoxMesh_n7y2e")
+
+[node name="TransitionPoint" type="Marker3D" parent="." unique_id=82894809]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)

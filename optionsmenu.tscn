@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://dxgrl6uo6uc7y"]
+
+[ext_resource type="Script" uid="uid://dkwvby5bxvirv" path="res://OptionsMenu.gd" id="1_gtb43"]
+
+[node name="OptionsMenu" type="Control" unique_id=868454613]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -1.5
+offset_bottom = 1.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gtb43")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1803818796]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=897922121]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1411086800]
+layout_mode = 2
+text = "OPTIONS"
+horizontal_alignment = 1
+
+[node name="MasterLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=866710812]
+layout_mode = 2
+text = "Master Volume"
+
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/VBoxContainer" unique_id=1333538924]
+layout_mode = 2
+value = 60.0
+
+[node name="MusicLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1057722822]
+layout_mode = 2
+text = "Music Volume"
+
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/VBoxContainer" unique_id=2077947837]
+layout_mode = 2
+value = 60.0
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1168313855]
+layout_mode = 2
+text = "Back"
+
+[node name="RotateMinimapCheckButton" type="CheckButton" parent="CenterContainer/VBoxContainer" unique_id=1409869080]
+layout_mode = 2
+text = "Minimap spin?? (no)"

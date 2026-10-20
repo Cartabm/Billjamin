@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ow0425kl5sxw"]
+
+[ext_resource type="Texture2D" uid="uid://bx7e80ob880cw" path="res://Assets/Textures/Terrain/Ground085_1K-JPG_Color.jpg" id="1_byjw4"]
+
+[resource]
+albedo_texture = ExtResource("1_byjw4")
+uv1_scale = Vector3(4, 4, 4)

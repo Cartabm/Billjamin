@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://bd7l8f2h0hrbf"]
+
+[ext_resource type="PackedScene" uid="uid://via6fav0jkb1" path="res://World/Rooms/Room_Straight.tscn" id="1_3uwk3"]
+[ext_resource type="Script" uid="uid://cwp7a3hl1pl7i" path="res://World/dungeon_generator.gd" id="2_1tga0"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(24, 0.5, 24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(24, 0.5, 24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wb3t4"]
+size = Vector3(24, 5, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lql3f"]
+size = Vector3(24, 5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xavbd"]
+size = Vector3(1, 5, 24)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fs334"]
+size = Vector3(1, 5, 24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ap0u0"]
+size = Vector3(1, 5, 24)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_prtu8"]
+size = Vector3(1, 5, 24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_prtu8"]
+size = Vector3(10, 5, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jni1y"]
+size = Vector3(10, 5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_oomdq"]
+size = Vector3(10, 5, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n7y2e"]
+size = Vector3(10, 5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jni1y"]
+size = Vector3(4, 0.55, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oomdq"]
+size = Vector3(4, 0.5, 12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_n7y2e"]
+size = Vector3(1, 5, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hieja"]
+size = Vector3(1, 5, 12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fs334"]
+size = Vector3(1, 5, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5xtxm"]
+size = Vector3(1, 5, 12)
+
+[node name="UndergroundLevel" type="Node3D" unique_id=698673705]
+
+[node name="Enviroment" type="Node3D" parent="." unique_id=1441475634]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Enviroment" unique_id=587216782]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Enviroment" unique_id=1469991823]
+transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 5.4921036, 11.629674)
+light_energy = 0.6
+
+[node name="Dungeon" type="Node3D" parent="." unique_id=2004379267]
+
+[node name="Floors" type="Node3D" parent="Dungeon" unique_id=1405256322]
+
+[node name="StartingRoomFloor" type="StaticBody3D" parent="Dungeon/Floors" unique_id=1864709337]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Floors/StartingRoomFloor" unique_id=837706863]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("BoxShape3D_ap0u0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Floors/StartingRoomFloor" unique_id=498932813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="Walls" type="Node3D" parent="Dungeon" unique_id=202831038]
+
+[node name="NorthWall" type="StaticBody3D" parent="Dungeon/Walls" unique_id=1543234482]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Walls/NorthWall" unique_id=684284252]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 12)
+mesh = SubResource("BoxMesh_wb3t4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Walls/NorthWall" unique_id=918082770]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 12)
+shape = SubResource("BoxShape3D_lql3f")
+
+[node name="WestWall" type="StaticBody3D" parent="Dungeon/Walls" unique_id=257655149]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Walls/WestWall" unique_id=261869448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 0)
+mesh = SubResource("BoxMesh_xavbd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Walls/WestWall" unique_id=488590461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 0)
+shape = SubResource("BoxShape3D_fs334")
+
+[node name="EastWall" type="StaticBody3D" parent="Dungeon/Walls" unique_id=1611692684]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Walls/EastWall" unique_id=2038452823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 0)
+mesh = SubResource("BoxMesh_ap0u0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Walls/EastWall" unique_id=397343110]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 0)
+shape = SubResource("BoxShape3D_prtu8")
+
+[node name="NorthWallLeft" type="StaticBody3D" parent="Dungeon/Walls" unique_id=1033207298]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Walls/NorthWallLeft" unique_id=1561071892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.5, -12)
+mesh = SubResource("BoxMesh_prtu8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Walls/NorthWallLeft" unique_id=15954805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.5, -12)
+shape = SubResource("BoxShape3D_jni1y")
+
+[node name="NorthWallRight" type="StaticBody3D" parent="Dungeon/Walls" unique_id=1173973702]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Walls/NorthWallRight" unique_id=908944059]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.5, -12)
+mesh = SubResource("BoxMesh_oomdq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Walls/NorthWallRight" unique_id=1647353880]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.5, -12)
+shape = SubResource("BoxShape3D_n7y2e")
+
+[node name="Rooms" type="Node3D" parent="Dungeon" unique_id=1628812006]
+
+[node name="Room02" parent="Dungeon/Rooms" unique_id=1614547231 instance=ExtResource("1_3uwk3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -34)
+
+[node name="Corridors" type="Node3D" parent="Dungeon" unique_id=1838014320]
+
+[node name="Corridor01" type="StaticBody3D" parent="Dungeon/Corridors" unique_id=575346139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -18)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Corridors/Corridor01" unique_id=1408174852]
+mesh = SubResource("BoxMesh_jni1y")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Corridors/Corridor01" unique_id=428047698]
+shape = SubResource("BoxShape3D_oomdq")
+
+[node name="CorridorLeftWall" type="StaticBody3D" parent="Dungeon/Corridors" unique_id=1914540249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.5, -18)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Corridors/CorridorLeftWall" unique_id=1293362966]
+mesh = SubResource("BoxMesh_n7y2e")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Corridors/CorridorLeftWall" unique_id=2002576829]
+shape = SubResource("BoxShape3D_hieja")
+
+[node name="CorridorRightWall" type="StaticBody3D" parent="Dungeon/Corridors" unique_id=1889001974]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.5, -18)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dungeon/Corridors/CorridorRightWall" unique_id=2055170516]
+mesh = SubResource("BoxMesh_fs334")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon/Corridors/CorridorRightWall" unique_id=476859735]
+shape = SubResource("BoxShape3D_5xtxm")
+
+[node name="GeneratedRooms" type="Node3D" parent="Dungeon" unique_id=2059388606]
+script = ExtResource("2_1tga0")
+
+[node name="Entrances" type="Node3D" parent="." unique_id=1788410599]
+
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=449728682]
+
+[node name="PlayerSpawn" type="Marker3D" parent="SpawnPoints" unique_id=1481598196]

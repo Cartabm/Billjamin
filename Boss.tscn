@@ -1,0 +1,272 @@
+[gd_scene format=3 uid="uid://05cnluvyrarn"]
+
+[ext_resource type="Script" uid="uid://bqgyn0ixvstv0" path="res://Boss.gd" id="1_4jvlg"]
+[ext_resource type="PackedScene" uid="uid://cbkrg7x0m3dis" path="res://demon_2.tscn" id="2_paxtu"]
+[ext_resource type="Texture2D" uid="uid://b3tyuxhrdhr6y" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_1.png" id="3_yaeqc"]
+[ext_resource type="Texture2D" uid="uid://d2hi0djrdgy4i" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_2.png" id="4_d17y6"]
+[ext_resource type="Texture2D" uid="uid://dmrj6wh72ohta" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_3.png" id="5_0h4ba"]
+[ext_resource type="Texture2D" uid="uid://dnihk4v52h6gm" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_4.png" id="6_kxa5u"]
+[ext_resource type="Texture2D" uid="uid://b1qg4lesafyrv" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_5.png" id="7_libhe"]
+[ext_resource type="Texture2D" uid="uid://b1gumiop1kylk" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_6.png" id="8_2im2i"]
+[ext_resource type="Texture2D" uid="uid://bokbfv3ojh5qi" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_7.png" id="9_3sfiq"]
+[ext_resource type="Texture2D" uid="uid://dcokaim1jjcg1" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_8.png" id="10_hkqbs"]
+[ext_resource type="Texture2D" uid="uid://cxs17e5cbj86x" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_9.png" id="11_xicb6"]
+[ext_resource type="Texture2D" uid="uid://bc2o7k3vrxww1" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_10.png" id="12_6n202"]
+[ext_resource type="Texture2D" uid="uid://cqyxe30pu08qv" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_11.png" id="13_hwoch"]
+[ext_resource type="Texture2D" uid="uid://bl26n25esmyux" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_12.png" id="14_vto63"]
+[ext_resource type="Texture2D" uid="uid://ofwcwb5r770m" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_13.png" id="15_1e2xj"]
+[ext_resource type="Texture2D" uid="uid://5uk1x3m7u3cj" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_14.png" id="16_4y578"]
+[ext_resource type="Texture2D" uid="uid://cyy47ksmi27f5" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_15.png" id="17_ayb7h"]
+[ext_resource type="Texture2D" uid="uid://dkjhkyu4wj0wy" path="res://Assets/2D Project/mino_v1.1_free/animations/atk_1/atk_1_16.png" id="18_ba5dl"]
+[ext_resource type="Texture2D" uid="uid://ckfftj4s78u8p" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_1.png" id="19_7lpb1"]
+[ext_resource type="Texture2D" uid="uid://1veyi11xtd32" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_2.png" id="20_tj0px"]
+[ext_resource type="Texture2D" uid="uid://cvckhnfkvorxs" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_3.png" id="21_ivuwu"]
+[ext_resource type="Texture2D" uid="uid://did03a5frdwv3" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_4.png" id="22_f0og4"]
+[ext_resource type="Texture2D" uid="uid://e7fiw8gf0wol" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_5.png" id="23_guvyy"]
+[ext_resource type="Texture2D" uid="uid://dgh5qvv2sd521" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_6.png" id="24_ueung"]
+[ext_resource type="Texture2D" uid="uid://caelnmwdahk6u" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_7.png" id="25_goigd"]
+[ext_resource type="Texture2D" uid="uid://bitwig5pvtnf1" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_8.png" id="26_pfy3t"]
+[ext_resource type="Texture2D" uid="uid://cmr7c5j7u55ih" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_9.png" id="27_ki8it"]
+[ext_resource type="Texture2D" uid="uid://bho5wfhxit5pj" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_10.png" id="28_82bm1"]
+[ext_resource type="Texture2D" uid="uid://baagy6cmwrtcf" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_11.png" id="29_22ll5"]
+[ext_resource type="Texture2D" uid="uid://cr0i4kncyq1u4" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_12.png" id="30_f32x6"]
+[ext_resource type="Texture2D" uid="uid://ba1kuxexq0byl" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_13.png" id="31_psipp"]
+[ext_resource type="Texture2D" uid="uid://wfv3prkbhms" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_14.png" id="32_2lo5n"]
+[ext_resource type="Texture2D" uid="uid://fgod12x52men" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_15.png" id="33_mobgu"]
+[ext_resource type="Texture2D" uid="uid://bbyfhpy65xl5q" path="res://Assets/2D Project/mino_v1.1_free/animations/idle/idle_16.png" id="34_l3shp"]
+[ext_resource type="Texture2D" uid="uid://cawmoxljpmeqf" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_1.png" id="35_c3iq3"]
+[ext_resource type="Texture2D" uid="uid://bh244qsd05neu" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_2.png" id="36_7lw4l"]
+[ext_resource type="Texture2D" uid="uid://dlhn8m14k781q" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_3.png" id="37_6iwmi"]
+[ext_resource type="Texture2D" uid="uid://boqhbgybp24pw" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_4.png" id="38_jcrtw"]
+[ext_resource type="Texture2D" uid="uid://dya341ck7sudp" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_5.png" id="39_1n7h2"]
+[ext_resource type="Texture2D" uid="uid://htlwd4swjux8" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_6.png" id="40_yhn0q"]
+[ext_resource type="Texture2D" uid="uid://c3e2t4ufgjdkh" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_7.png" id="41_ictme"]
+[ext_resource type="Texture2D" uid="uid://yv5dmqaidfgb" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_8.png" id="42_vmg3u"]
+[ext_resource type="Texture2D" uid="uid://dytudojt0sp2h" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_9.png" id="43_0xo2e"]
+[ext_resource type="Texture2D" uid="uid://cyvfefrxm8tin" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_10.png" id="44_noqin"]
+[ext_resource type="Texture2D" uid="uid://cx6kyxfkgtik" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_11.png" id="45_h4xxr"]
+[ext_resource type="Texture2D" uid="uid://bid8sq4cfldce" path="res://Assets/2D Project/mino_v1.1_free/animations/walk/walk_12.png" id="46_ug0at"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g2h38"]
+atlas = ExtResource("3_yaeqc")
+region = Rect2(0, 0, 288, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xrc53"]
+atlas = ExtResource("4_d17y6")
+region = Rect2(0, 0, 288, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2pyij"]
+atlas = ExtResource("5_0h4ba")
+region = Rect2(0, 0, 288, 160)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ek0cf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g2h38")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xrc53")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2pyij")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_kxa5u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_libhe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_2im2i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_3sfiq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_hkqbs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_xicb6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_6n202")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_hwoch")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_vto63")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_1e2xj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_4y578")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_ayb7h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_ba5dl")
+}],
+"loop": 0,
+"name": &"Attack01",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_7lpb1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_tj0px")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_ivuwu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_f0og4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_guvyy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_ueung")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_goigd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_pfy3t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_ki8it")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_82bm1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_22ll5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_f32x6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_psipp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_2lo5n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_mobgu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_l3shp")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("35_c3iq3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_7lw4l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_6iwmi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_jcrtw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_1n7h2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_yhn0q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_ictme")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_vmg3u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_0xo2e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_noqin")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_h4xxr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_ug0at")
+}],
+"loop": 1,
+"name": &"Walk",
+"speed": 8.0
+}]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ap0u0"]
+albedo_color = Color(0.978085, 0, 0.079182096, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ek0cf"]
+height = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(1, 0.12, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_prtu8"]
+albedo_color = Color(0.6204508, 0.2153762, 0.015175914, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oomdq"]
+albedo_color = Color(0.3212404, 0.7702119, 0.42425916, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jni1y"]
+size = Vector3(0.9, 0.08, 0.05)
+
+[node name="Boss" type="CharacterBody3D" unique_id=394797931]
+script = ExtResource("1_4jvlg")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="." unique_id=145779027]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0.5, 0)
+billboard = 1
+texture_filter = 0
+sprite_frames = SubResource("SpriteFrames_ek0cf")
+animation = &"Attack01"
+frame = 15
+frame_progress = 1.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1886881137]
+visible = false
+mesh = SubResource("CapsuleMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_ap0u0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=601162159]
+shape = SubResource("CapsuleShape3D_ek0cf")
+
+[node name="MonsterVisual" parent="." unique_id=345412314 instance=ExtResource("2_paxtu")]
+transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
+visible = false
+
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" parent_id_path=PackedInt32Array(345412314, 1583117048) index="0" unique_id=1267743977]
+bones/7/rotation = Quaternion(-0.39071882, -0.00025390706, 0.000107201646, 0.9205102)
+
+[node name="HealthBar" type="Node3D" parent="." unique_id=1222438187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4974384, 0)
+
+[node name="BarBackground" type="MeshInstance3D" parent="HealthBar" unique_id=689025918]
+mesh = SubResource("BoxMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_prtu8")
+
+[node name="BarFill" type="MeshInstance3D" parent="HealthBar" unique_id=1033002703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.03)
+material_override = SubResource("StandardMaterial3D_oomdq")
+mesh = SubResource("BoxMesh_jni1y")
+
+[editable path="MonsterVisual"]

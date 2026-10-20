@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://dstk74csou7m"]
+
+[ext_resource type="Script" uid="uid://bfgoe5chxcio3" path="res://World/Rooms/dungeon_generator_test.gd" id="1_o1cie"]
+[ext_resource type="Script" uid="uid://jyd4vc5vnpc3" path="res://World/Rooms/debug_camera.gd" id="2_ejpmr"]
+[ext_resource type="Material" uid="uid://bym7cu8fkqbss" path="res://World/Materials/MineFloor_01.tres" id="2_ijsoo"]
+[ext_resource type="PackedScene" uid="uid://x2aibfdis1lc" path="res://enemy.tscn" id="2_vwcm0"]
+[ext_resource type="PackedScene" uid="uid://5sgy0k2htp7b" path="res://player.tscn" id="3_jqupq"]
+[ext_resource type="PackedScene" uid="uid://m8j8e8kv0mgl" path="res://enemy_brute.tscn" id="3_juk56"]
+[ext_resource type="Material" uid="uid://b6nn70h8pi0rx" path="res://World/Materials/MineFloor_02.tres" id="3_lgjlv"]
+[ext_resource type="Material" uid="uid://ow0425kl5sxw" path="res://World/Materials/MineFloor_03.tres" id="4_4bhmb"]
+[ext_resource type="PackedScene" uid="uid://dyfv5ysxlde2i" path="res://TownCamera.tscn" id="4_gwcxa"]
+[ext_resource type="PackedScene" uid="uid://bg6eaj5wkjbx0" path="res://enemy_charger.tscn" id="4_ujfds"]
+[ext_resource type="PackedScene" uid="uid://dj86n2ifo4rmb" path="res://enemy_stalker.tscn" id="5_ldg5d"]
+[ext_resource type="Material" uid="uid://udec7s476i4n" path="res://World/Materials/MineWall_01.tres" id="5_vmnc5"]
+[ext_resource type="Material" uid="uid://cakae2nmj2taw" path="res://World/Materials/MineWall_02.tres" id="6_g3q2x"]
+[ext_resource type="Script" uid="uid://bmgeato2hgjxo" path="res://World/Rooms/dungeon_settings.gd" id="6_ujfds"]
+[ext_resource type="Material" uid="uid://chmj2d3x0t8ow" path="res://World/Materials/MineWall_03.tres" id="7_hhjpt"]
+[ext_resource type="PackedScene" uid="uid://c5u6x54kpwma5" path="res://GameHUD.tscn" id="9_juk56"]
+[ext_resource type="Script" uid="uid://csn43cdjswd3q" path="res://World/Rooms/dungeon_timer_ui.gd" id="11_ldg5d"]
+[ext_resource type="PackedScene" uid="uid://05cnluvyrarn" path="res://Boss.tscn" id="12_4bhmb"]
+[ext_resource type="PackedScene" uid="uid://dlg6kxik2nryg" path="res://enemy_ranged.tscn" id="12_vmnc5"]
+[ext_resource type="PackedScene" uid="uid://ckqw4rtpywb0i" path="res://World/Materials/DungeonMinimap.tscn" id="18_lgjlv"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_t86xs"]
+load_path = "res://.godot/imported/Ornate Fantasy RPG Plaque Banner.png-a21f6bfb04dc8e20c7aa94bd2fad7d2e.ctex"
+
+[sub_resource type="Environment" id="Environment_ek0cf"]
+background_mode = 1
+background_color = Color(0.03137255, 0.039215688, 0.050980393, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.47058824, 0.5137255, 0.5921569, 1)
+ambient_light_energy = 0.35
+fog_enabled = true
+fog_light_color = Color(0.03137255, 0.039215688, 0.050980393, 1)
+fog_light_energy = 0.5
+fog_density = 0.035
+
+[node name="DungeonGeneratorTest" type="Node3D" unique_id=328990981]
+script = ExtResource("1_o1cie")
+floor_materials = Array[StandardMaterial3D]([ExtResource("2_ijsoo"), ExtResource("3_lgjlv"), ExtResource("4_4bhmb")])
+wall_materials = Array[StandardMaterial3D]([ExtResource("5_vmnc5"), ExtResource("6_g3q2x"), ExtResource("7_hhjpt")])
+dungeon_enemy_scenes = Array[PackedScene]([ExtResource("5_ldg5d"), ExtResource("4_ujfds"), ExtResource("3_juk56"), ExtResource("2_vwcm0"), ExtResource("12_vmnc5")])
+boss_scene = ExtResource("12_4bhmb")
+
+[node name="DungeonSettings" type="Node3D" parent="." unique_id=1402744317]
+script = ExtResource("6_ujfds")
+
+[node name="GeneratedRooms" type="Node3D" parent="." unique_id=212206726]
+
+[node name="GeneratedCorridors" type="Node3D" parent="." unique_id=696553692]
+
+[node name="DebugCamera" type="Camera3D" parent="." unique_id=1810818346]
+transform = Transform3D(1, 0, 0, 0, 0.42261824, 0.9063078, 0, -0.9063078, 0.42261824, 0, 0, 12)
+script = ExtResource("2_ejpmr")
+
+[node name="DebugLight" type="DirectionalLight3D" parent="." unique_id=1827937844]
+transform = Transform3D(0.8660254, 0.43301272, -0.24999999, 0, 0.49999997, 0.86602545, 0.5, -0.75, 0.43301266, 0, 0, 0)
+
+[node name="Player" parent="." unique_id=2007028265 instance=ExtResource("3_jqupq")]
+dodge_speed = 22.0
+dodge_cooldown = 5.0
+
+[node name="Camera3D" parent="." unique_id=1100074316 instance=ExtResource("4_gwcxa")]
+transform = Transform3D(1.0000001, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0)
+
+[node name="CanvasLayer" parent="." unique_id=1964970453 instance=ExtResource("9_juk56")]
+process_mode = 3
+
+[node name="DungeonTimerFrame" type="TextureRect" parent="CanvasLayer" unique_id=2145106375]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_right = 260.0
+offset_bottom = 160.0
+grow_horizontal = 2
+scale = Vector2(0.7, 0.7)
+mouse_filter = 2
+texture = SubResource("CompressedTexture2D_t86xs")
+expand_mode = 1
+script = ExtResource("11_ldg5d")
+
+[node name="DungeonTimerLabel" type="Label" parent="CanvasLayer/DungeonTimerFrame" unique_id=1693155785]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.89411765, 0.627451, 1)
+theme_override_colors/font_outline_color = Color(0.09411765, 0.05490196, 0.03137255, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 48
+text = "00:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DungeonMinimap" parent="." unique_id=260080673 instance=ExtResource("18_lgjlv")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1756619945]
+environment = SubResource("Environment_ek0cf")

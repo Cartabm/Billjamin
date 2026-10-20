@@ -1,0 +1,7 @@
+[gd_resource type="Theme" format=3 uid="uid://dd1d62vlnh326"]
+
+[ext_resource type="FontFile" uid="uid://unev7b8cmled" path="res://Assets/Font/Marcellus/Marcellus-Regular.ttf" id="1_rqubh"]
+
+[resource]
+default_font = ExtResource("1_rqubh")
+default_font_size = 18

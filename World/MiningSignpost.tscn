@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://driwv3hf2eyje"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(0.3, 3, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_prtu8"]
+albedo_color = Color(0.22352941, 0.16078432, 0.12156863, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ap0u0"]
+size = Vector3(2.8, 0.65, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jni1y"]
+albedo_color = Color(0.41960785, 0.31764707, 0.22352941, 1)
+
+[node name="MiningSignpost" type="Node3D" unique_id=1337987280]
+
+[node name="Post" type="MeshInstance3D" parent="." unique_id=1941258403]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("BoxMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_prtu8")
+
+[node name="SignBoard" type="MeshInstance3D" parent="." unique_id=908090967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 2.45, 0)
+mesh = SubResource("BoxMesh_ap0u0")
+surface_material_override/0 = SubResource("StandardMaterial3D_jni1y")
+
+[node name="SignText" type="Label3D" parent="." unique_id=493772819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.99503183, 2.45, 0.115)
+pixel_size = 0.003
+modulate = Color(0.83137256, 0.7647059, 0.627451, 1)
+text = "OLD HAUL ROAD"
+font_size = 48

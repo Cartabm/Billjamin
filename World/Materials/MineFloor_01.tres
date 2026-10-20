@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bym7cu8fkqbss"]
+
+[ext_resource type="Texture2D" uid="uid://cg00kjj0l4p70" path="res://World/Materials/DungeonThemes/AncientRuins/Floor_01.png" id="1_7jyp5"]
+
+[resource]
+albedo_texture = ExtResource("1_7jyp5")
+uv1_scale = Vector3(4, 4, 4)

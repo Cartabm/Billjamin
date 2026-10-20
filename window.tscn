@@ -1,0 +1,1589 @@
+[gd_scene format=3 uid="uid://ddkb0in3e7wd"]
+
+[sub_resource type="GDScript" id="GDScript_3ebo7"]
+script/source = "@tool
+extends Window
+## Godot Resource Cleaner Main Script
+
+enum Sort {
+	NONE,
+	SIZE_ASC,
+	SIZE_DESC,
+	PATH_ASC,
+	PATH_DESC,
+}
+var sort : Sort = Sort.NONE
+
+enum Exception {
+	IGN_FOLDER,
+	IGN_EXTENSION,
+	EXCL_FOLDER,
+	EXCL_EXTENSION,
+	EXCL_CONTAINING,
+}
+
+const SETTING_USE_MULTITHREADING := \"ResCleaner/data/use_multithreading\"
+const SETTING_KEEP_LIST := \"ResCleaner/data/keep_list\"
+const SETTING_IGNORE_FOLDER := \"ResCleaner/data/ignore_folder\"
+const SETTING_IGNORE_EXT := \"ResCleaner/data/ignore_ext\"
+const SETTING_EXCLUDE_FOLDER := \"ResCleaner/data/exclude_folder\"
+const SETTING_EXCLUDE_EXT := \"ResCleaner/data/exclude_ext\"
+const SETTING_EXCLUDE_CONTAINING := \"ResCleaner/data/exclude_containing\"
+
+const EXCLUDE_FOLDER_DEFAULT := [\".godot\", \"addons\", \".git\"]
+const EXCLUDE_EXT_DEFAULT := [\".godot\", \".import\", \".uid\"]
+const EXCLUDE_CONTAINING_DEFAULT := [\"gitignore\", \"gitattributes\"]
+
+## Main Screen
+@onready var main: PanelContainer = %Main
+@onready var setting: PanelContainer = %Setting
+@onready var keep_list: PanelContainer = %KeepList
+@onready var overlay: ColorRect = %Overlay
+@onready var button_scan: Button = %ButtonScan
+
+## Overlay screen nodes
+@onready var progress_bar: ProgressBar = %ProgressBar
+@onready var progress_label: Label = %ProgressLabel
+@onready var cancel_button: Button = %CancelButton
+
+## Setting screen nodes
+@onready var use_multithreading_check_button: CheckButton = %UseMultithreadingCheckButton
+
+var exclude_folder := []
+var exclude_ext := []
+var exclude_containing := []
+
+var ignore_folder := []
+var ignore_ext := []
+
+var search_ext : Array[String] = []
+
+var keep_paths : Array[String] = []
+var unused_files := []
+
+var scan_thread : Thread
+
+var selected_count := 0
+var filter_on := false
+var ignore_on := false
+var use_multithreading := true
+var is_scanning := false
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		var theme_icon := EditorInterface.get_base_control()
+		%ButtonSetting.icon = theme_icon.get_theme_icon(\"Tools\", \"EditorIcons\")
+		%ButtonKeepList.icon = theme_icon.get_theme_icon(\"FileList\", \"EditorIcons\")
+		button_scan.icon = theme_icon.get_theme_icon(\"Search\", \"EditorIcons\")
+		%ButtonClean.icon = theme_icon.get_theme_icon(\"Clear\", \"EditorIcons\")
+		%ButtonKeep.icon = theme_icon.get_theme_icon(\"Pin\", \"EditorIcons\")
+		%ButtonDelete.icon = theme_icon.get_theme_icon(\"Remove\", \"EditorIcons\")
+		%ButtonDoneSetting.icon = theme_icon.get_theme_icon(\"Back\", \"EditorIcons\")
+		%ButtonDoneKL.icon = theme_icon.get_theme_icon(\"Back\", \"EditorIcons\")
+		%ButtonSettingReset.icon = theme_icon.get_theme_icon(\"Reload\", \"EditorIcons\")
+		%ExcludeButton.icon = theme_icon.get_theme_icon(\"NodeWarning\", \"EditorIcons\")
+		%ButtonRemoveAll.icon = theme_icon.get_theme_icon(\"Remove\", \"EditorIcons\")
+	
+	%HBoxFilter.visible = filter_on
+	%VBoxIgnore.visible = ignore_on
+	main.visible = true
+	overlay.visible = false
+	setting.visible = false
+	
+	cancel_button.pressed.connect(_on_cancel_scan_pressed)
+	_hide_progress_ui()
+	
+	FileUtils.get_instance().progress_updated.connect(_on_scan_progress_updated)
+	
+	if ProjectSettings.has_setting(SETTING_KEEP_LIST):
+		keep_paths = ProjectSettings.get(SETTING_KEEP_LIST)
+		for path in keep_paths:
+			%VBoxKeepList.add_child(_add_keep_list_row(path))
+	
+	if ProjectSettings.has_setting(SETTING_USE_MULTITHREADING):
+		use_multithreading = ProjectSettings.get(SETTING_USE_MULTITHREADING)
+	use_multithreading_check_button.button_pressed = use_multithreading
+	
+	_load_exceptions(SETTING_IGNORE_FOLDER, Exception.IGN_FOLDER)
+	_load_exceptions(SETTING_IGNORE_EXT, Exception.IGN_EXTENSION)
+	_load_exceptions_wdefault(SETTING_EXCLUDE_FOLDER, EXCLUDE_FOLDER_DEFAULT, Exception.EXCL_FOLDER)
+	_load_exceptions_wdefault(SETTING_EXCLUDE_EXT, EXCLUDE_EXT_DEFAULT, Exception.EXCL_EXTENSION)
+	_load_exceptions_wdefault(SETTING_EXCLUDE_CONTAINING, EXCLUDE_CONTAINING_DEFAULT, Exception.EXCL_CONTAINING)
+
+func _hide_progress_ui() -> void:
+	overlay.visible = false
+	if progress_bar: progress_bar.visible = false
+	if progress_label: progress_label.visible = false
+	if cancel_button: cancel_button.visible = false
+
+func _show_progress_ui() -> void:
+	overlay.visible = true
+	if progress_bar:
+		progress_bar.visible = true
+		progress_bar.value = 0
+	if progress_label:
+		progress_label.visible = true
+		progress_label.text = \"Starting scan...\"
+	if cancel_button:
+		cancel_button.visible = true
+		cancel_button.disabled = false
+
+func _on_scan_progress_updated(current: int, total: int, message: String) -> void:
+	_update_progress_ui.call_deferred(current, total, message)
+
+func _update_progress_ui(current: int, total: int, message: String) -> void:
+	if progress_bar: progress_bar.value = (float(current) / total) * 100
+	if progress_label: progress_label.text = message
+
+func _on_cancel_scan_pressed() -> void:
+	if not is_scanning: return
+	
+	FileUtils.cancel_scan()
+	cancel_button.disabled = true
+	
+	if progress_label: progress_label.text = \"Cancelling...\"
+
+func cancel_active_scan() -> void:
+	if not is_scanning: return
+	FileUtils.cancel_scan()
+	if scan_thread:
+		scan_thread.wait_to_finish()
+		scan_thread = null
+	is_scanning = false
+
+func _load_exceptions(setting: String, type: Exception) -> void:
+	if not ProjectSettings.has_setting(setting): return
+	var items : Array = ProjectSettings.get(setting)
+	for i in items:
+		_add_exception(i, type, false)
+
+func _load_exceptions_wdefault(setting: String, default_list: Array, type: Exception) -> void:
+	var items : Array = ProjectSettings.get(setting) if ProjectSettings.has_setting(setting) else default_list
+	for i in items:
+		_add_exception(i, type, false)
+
+
+func _on_close_requested() -> void:
+	visible = false
+
+func _on_button_setting_pressed() -> void:
+	%Setting.show()
+
+func _on_button_keep_list_pressed() -> void:
+	%KeepList.show()
+
+func _on_button_scan_pressed() -> void:
+	if is_scanning: return
+	
+	is_scanning = true
+	button_scan.disabled = true
+	_show_progress_ui()
+	
+	scan_thread = Thread.new()
+	scan_thread.start(_perform_scan_async)
+
+func _perform_scan_async() -> void:
+	selected_count = 0
+	unused_files = FileUtils.scan_res(
+			filter_on,
+			search_ext,
+			exclude_folder,
+			exclude_ext,
+			exclude_containing,
+			keep_paths,
+			ignore_on,
+			ignore_folder,
+			ignore_ext,
+			use_multithreading)
+	
+	_on_scan_completed.call_deferred()
+
+func _on_scan_completed() -> void:
+	is_scanning = false
+	button_scan.disabled = false
+	_hide_progress_ui()
+	
+	FileUtils.sorting(unused_files, sort)
+	_draw_result()
+	
+	if scan_thread:
+		scan_thread.wait_to_finish()
+		scan_thread = null
+
+func _on_button_clean_pressed() -> void:
+	%CBImport.button_pressed = true
+	%CBUid.button_pressed = true
+	%CBFolders.button_pressed = true
+	%ConfirmationDialogClean.show()
+
+func _on_confirmation_dialog_clean_confirmed() -> void:
+	var any_clean := false
+	if %CBImport.button_pressed:
+		any_clean = true
+		FileUtils.clean_import(\"res://\", exclude_folder)
+	if %CBUid.button_pressed:
+		any_clean = true
+		FileUtils.clean_uid(\"res://\", exclude_folder)
+	if %CBFolders.button_pressed:
+		any_clean = true
+		FileUtils.clean_empty_folders(\"res://\", exclude_folder)
+		
+	if any_clean: _refresh_filesystem()
+
+
+func _on_size_button_pressed() -> void:
+	sort = Sort.SIZE_DESC if sort == Sort.SIZE_ASC else Sort.SIZE_ASC
+	FileUtils.sorting(unused_files, sort)
+	_draw_result()
+
+func _on_path_button_pressed() -> void:
+	sort = Sort.PATH_DESC if sort == Sort.PATH_ASC else Sort.PATH_ASC
+	FileUtils.sorting(unused_files, sort)
+	_draw_result()
+
+func _refresh() -> void:
+	selected_count = 0
+	unused_files = FileUtils.scan_res(
+			filter_on,
+			search_ext,
+			exclude_folder,
+			exclude_ext,
+			exclude_containing,
+			keep_paths,
+			ignore_on,
+			ignore_folder,
+			ignore_ext,
+			use_multithreading)
+	FileUtils.sorting(unused_files, sort)
+	_draw_result()
+
+func _refresh_filesystem() -> void:
+	EditorInterface.get_resource_filesystem().scan()
+
+
+func _on_first_checkbox_toggled(is_toggled: bool) -> void:
+	for file in unused_files:
+		file.checkbox.button_pressed = is_toggled
+
+func _on_checkbox_toggled(is_toggled: bool, file: Dictionary) -> void:
+	file.is_checked = is_toggled
+	selected_count += 1 if is_toggled else -1
+
+
+func _on_button_keep_pressed() -> void:
+	if unused_files.is_empty():
+		print(\"Please press scan first\")
+		return
+		
+	if selected_count == 0:
+		print(\"Nothing selected\")
+		return
+		
+	for ndf in unused_files:
+		if ndf.is_checked:
+			var path = ndf.path
+			if !keep_paths.has(path):
+				keep_paths.append(path)
+				%VBoxKeepList.add_child(_add_keep_list_row(path))
+	
+	ProjectSettings.set(SETTING_KEEP_LIST, keep_paths)
+	ProjectSettings.save()
+	_refresh()
+
+func _on_button_delete_pressed() -> void:
+	if unused_files.is_empty():
+		print(\"Please press scan first\")
+		return
+		
+	if selected_count == 0:
+		print(\"Nothing selected\")
+		return
+	
+	%ConfirmationDialog.dialog_text = \"Are you sure you want to permanently delete all selected files (%d)? This action cannot be undone.\" % selected_count
+	%ConfirmationDialog.show()
+
+func _on_confirmation_dialog_confirmed() -> void:
+	FileUtils.delete_selected(unused_files)
+	_refresh_filesystem()
+	_refresh()
+
+func _on_le_filter_text_changed(new_text: String) -> void:
+	var filter : String = new_text.strip_edges().to_lower()
+	
+	for c in %VBoxMain.get_children():
+		var p_label : Label = c.get_node_or_null(\"PathLabel\")
+		if p_label:
+			var path_text : String = p_label.text.to_lower()
+			c.visible = filter == \"\" or path_text.contains(filter)
+
+
+
+func _draw_result() -> void:
+	for child in %VBoxMain.get_children():
+		child.queue_free()
+	
+	if unused_files.is_empty(): return
+	
+	%VBoxMain.add_child(_add_first_row())
+	%VBoxMain.add_child(HSeparator.new())
+	
+	for ndf in unused_files:
+		%VBoxMain.add_child(_add_row(ndf))
+
+func _add_first_row() -> HBoxContainer:
+	var hbox := HBoxContainer.new()
+	
+	var c_box := CheckBox.new()
+	c_box.toggled.connect(_on_first_checkbox_toggled)
+	
+	var placeholder = Container.new()
+	placeholder.custom_minimum_size.x = 48
+	
+	var s_button := Button.new()
+	s_button.text = \"Size\"
+	s_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	s_button.custom_minimum_size.x = 80
+	s_button.pressed.connect(_on_size_button_pressed)
+	
+	var p_button := Button.new()
+	p_button.text = \"Path\"
+	p_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	p_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	p_button.pressed.connect(_on_path_button_pressed)
+	
+	hbox.add_child(c_box)
+	hbox.add_child(placeholder)
+	hbox.add_child(s_button)
+	hbox.add_child(p_button)
+	
+	return hbox
+
+func _add_row(ndf: Dictionary) -> HBoxContainer:
+	var hbox := HBoxContainer.new()
+	
+	var c_box := CheckBox.new()
+	c_box.toggled.connect(_on_checkbox_toggled.bind(ndf))
+	ndf[\"checkbox\"] = c_box
+	
+	var tex_rec = TextureRect.new()
+	tex_rec.custom_minimum_size = Vector2(48, 48)
+	tex_rec.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	
+	var s_label := Label.new()
+	s_label.text = FileUtils.format_file_size(ndf.size)
+	s_label.custom_minimum_size.x = 80.0
+	
+	var p_label := Label.new()
+	p_label.name = \"PathLabel\"
+	p_label.text = ndf.path
+	hbox.add_child(c_box)
+	hbox.add_child(tex_rec)
+	hbox.add_child(s_label)
+	hbox.add_child(p_label)
+	
+	if Engine.is_editor_hint():
+		var preview = EditorInterface.get_resource_previewer()
+		preview.queue_resource_preview(ndf.path, self, \"_on_preview_ready\", tex_rec)
+	
+	return hbox
+
+func _add_keep_list_row(path: String) -> HBoxContainer:
+	var hbox := HBoxContainer.new()
+	var rem_button := Button.new()
+	rem_button.icon = EditorInterface.get_base_control().get_theme_icon(\"Remove\", \"EditorIcons\")
+	rem_button.pressed.connect(_on_button_remove_from_kl_pressed.bind(path, hbox))
+	var sep := VSeparator.new()
+	var tex_rec = TextureRect.new()
+	tex_rec.custom_minimum_size = Vector2(48, 48)
+	tex_rec.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var p_label := Label.new()
+	p_label.text = path
+	hbox.add_child(rem_button)
+	hbox.add_child(sep)
+	hbox.add_child(tex_rec)
+	hbox.add_child(p_label)
+	var preview = EditorInterface.get_resource_previewer()
+	preview.queue_resource_preview(path, self, \"_on_preview_ready\", tex_rec)
+	
+	return hbox
+
+
+
+func _on_button_remove_from_kl_pressed(path: String, node: Node) -> void:
+	if keep_paths.has(path):
+		keep_paths.erase(path)
+		
+		node.queue_free()
+		
+		ProjectSettings.set(SETTING_KEEP_LIST, keep_paths)
+		ProjectSettings.save()
+
+func _on_preview_ready(path: String, preview: Texture2D, thumbnail_preview: Texture2D, tex_rec):
+	if not is_instance_valid(tex_rec): return
+	
+	if preview: tex_rec.texture = preview
+	else: tex_rec.texture = EditorInterface.get_base_control().get_theme_icon(\"File\", \"EditorIcons\")
+
+func _on_button_remove_all_pressed() -> void:
+	if not keep_paths.is_empty(): %ConfirmationDialogKLRemoveAll.show()
+	else: print(\"No Files in the Keep List\")
+	
+func _on_confirmation_dialog_kl_remove_all_confirmed() -> void:
+	keep_paths.clear()
+	for c in %VBoxKeepList.get_children():
+		c.queue_free()
+		
+	ProjectSettings.set(SETTING_KEEP_LIST, keep_paths)
+	ProjectSettings.save()
+
+
+
+func _on_check_button_toggled(toggled_on: bool) -> void:
+	filter_on = toggled_on
+	%HBoxFilter.visible = filter_on
+
+func _on_button_done_pressed() -> void:
+	%Setting.hide()
+
+func _on_button_done_kl_pressed() -> void:
+	%KeepList.hide()
+
+func on_checkbox_toggled(toggled_on: bool, ext: String) -> void:
+	if toggled_on: search_ext.append(ext)
+	else:
+		if search_ext.has(ext):
+			search_ext.erase(ext)
+
+func _add_exception(txt: String, exception: Exception, save: bool) -> void:
+	var hbox := HBoxContainer.new()
+	var new_button := Button.new()
+	
+	if Engine.is_editor_hint(): new_button.icon = EditorInterface.get_base_control().get_theme_icon(\"Remove\", \"EditorIcons\")#\"Del\"
+	
+	new_button.pressed.connect(_on_delete_exception.bind(exception, txt, hbox))
+	var new_sep := VSeparator.new()
+	var new_label := Label.new()
+	new_label.text = txt
+	
+	hbox.add_child(new_button)
+	hbox.add_child(new_sep)
+	hbox.add_child(new_label)
+	
+	match exception:
+		Exception.IGN_FOLDER:
+			if not ignore_folder.has(txt):
+				ignore_folder.append(txt)
+				%VBoxIgnFolder.add_child(hbox)
+				if save: ProjectSettings.set(SETTING_IGNORE_FOLDER, ignore_folder)
+		Exception.IGN_EXTENSION:
+			if not ignore_ext.has(txt):
+				ignore_ext.append(txt)
+				%VBoxIgnExt.add_child(hbox)
+				if save: ProjectSettings.set(SETTING_IGNORE_EXT, ignore_ext)
+		Exception.EXCL_FOLDER:
+			if not exclude_folder.has(txt):
+				exclude_folder.append(txt)
+				%VBoxFolder.add_child(hbox)
+				if save: ProjectSettings.set(SETTING_EXCLUDE_FOLDER, exclude_folder)
+		Exception.EXCL_EXTENSION:
+			if not exclude_ext.has(txt):
+				exclude_ext.append(txt)
+				%VBoxExt.add_child(hbox)
+				if save: ProjectSettings.set(SETTING_EXCLUDE_EXT, exclude_ext)
+		Exception.EXCL_CONTAINING:
+			if not exclude_containing.has(txt):
+				exclude_containing.append(txt)
+				%VBoxContains.add_child(hbox)
+				if save: ProjectSettings.set(SETTING_EXCLUDE_CONTAINING, exclude_containing)
+	
+	if save: ProjectSettings.save()
+
+func _on_delete_exception(exception: Exception, txt: String, node: Node) -> void:
+	node.queue_free()
+	
+	match exception:
+		Exception.IGN_FOLDER:
+			if ignore_folder.has(txt): ignore_folder.erase(txt)
+			ProjectSettings.set(SETTING_IGNORE_FOLDER, ignore_folder)
+		Exception.IGN_EXTENSION:
+			if ignore_ext.has(txt): ignore_ext.erase(txt)
+			ProjectSettings.set(SETTING_IGNORE_EXT, ignore_ext)
+		Exception.EXCL_FOLDER:
+			if exclude_folder.has(txt): exclude_folder.erase(txt)
+			ProjectSettings.set(SETTING_EXCLUDE_FOLDER, exclude_folder)
+		Exception.EXCL_EXTENSION:
+			if exclude_ext.has(txt): exclude_ext.erase(txt)
+			ProjectSettings.set(SETTING_EXCLUDE_EXT, exclude_ext)
+		Exception.EXCL_CONTAINING:
+			if exclude_containing.has(txt): exclude_containing.erase(txt)
+			ProjectSettings.set(SETTING_EXCLUDE_CONTAINING, exclude_containing)
+	
+	ProjectSettings.save()
+
+func _on_ignore_check_button_toggled(toggled_on: bool) -> void:
+	ignore_on = toggled_on
+	%VBoxIgnore.visible = toggled_on
+
+func _on_button_ign_folder_pressed() -> void:
+	var txt : String = %TextEditIgnFolder.text.strip_edges()
+	if not txt.is_empty():
+		%TextEditIgnFolder.text = \"\"
+		_add_exception(txt, Exception.IGN_FOLDER, true)
+
+func _on_button_ign_ext_pressed() -> void:
+	var txt : String = %TextEditIgnExt.text.strip_edges()
+	if not txt.is_empty():
+		%TextEditIgnExt.text = \"\"
+		_add_exception(txt, Exception.IGN_EXTENSION, true)
+
+func _on_use_multithreading_check_button_toggled(toggled_on: bool) -> void:
+	use_multithreading = toggled_on
+	
+	ProjectSettings.set(SETTING_USE_MULTITHREADING, use_multithreading)
+	ProjectSettings.save()
+
+func _on_exclude_check_button_toggled(toggled_on: bool) -> void:
+	%VBoxExclude.visible = toggled_on
+
+func _on_button_exclude_folder_pressed() -> void:
+	var txt : String = %TextEditExcFolder.text.strip_edges()
+	if not txt.is_empty():
+		%TextEditExcFolder.text = \"\"
+		_add_exception(txt, Exception.EXCL_FOLDER, true)
+
+func _on_button_exclude_ext_pressed() -> void:
+	var txt : String = %TextEditExcExt.text.strip_edges()
+	if not txt.is_empty():
+		%TextEditExcExt.text = \"\"
+		_add_exception(txt, Exception.EXCL_EXTENSION, true)
+
+func _on_button_exclude_cont_pressed() -> void:
+	var txt : String = %TextEditExcContaining.text.strip_edges()
+	if not txt.is_empty():
+		%TextEditExcContaining.text = \"\"
+		_add_exception(txt, Exception.EXCL_CONTAINING, true)
+"
+
+[sub_resource type="DPITexture" id="DPITexture_mvsta"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M10.168 8.754a5 5 0 1 0-1.414 1.414l4.316 4.316 1.414-1.414zM6 3a3 3 0 0 1 0 6 3 3 0 0 1 0-6z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_hjewq"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m2 2v2h2v-2zm4 0v2h8v-2zm-4 5v2h2v-2zm4 0v2h8v-2zm-4 5v2h2v-2zm4 0v2h8v-2z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_nfq5s"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m8 1a1 1 0 0 0 -1 1v5h-2c-1.108 0-2 .892-2 2v1h10v-1c0-1.108-.892-2-2-2h-2v-5a1 1 0 0 0 -1-1zm-5 10v4l10-1v-3z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_srjdr"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M4 1 3 3l1 2v4H2v3.5a2.5 2.5 0 0 0 5 0V9H5V5l1-2-1-2zm6 .174a3 3 0 0 0 0 5.652V14a1 1 0 0 0 2 0V6.824a3 3 0 0 0 0-5.648V4a1 1 0 0 1-2 0z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_4vd1n"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m4 1v1l1 1v3h6v-3l1-1v-1zm1 6-2 3h10l-2-3zm2 4v2l1 2 1-2v-2z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_ifklg"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m5 1v1h-4v2h14v-2h-4v-1zm-3 4v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8zm1 2h2v6h-2zm4 0h2v6h-2zm4 0h2v6h-2z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_ygqcu"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"16\"><path fill=\"none\" stroke=\"#e0e0e0\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 2 2 8l4 6\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_cv8km"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M5 8a4 4 0 1 1 4 4v2a6 6 0 1 0-6-6H1l3 4 3-4z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="GDScript" id="GDScript_6usdr"]
+script/source = "@tool
+extends GridContainer
+## Setting and handling filters
+
+@export var root_window : Window
+@export var button : Button
+
+func _ready() -> void:
+	for c in get_children():
+		c.text = \".\" + c.name
+	
+	button.pressed.connect(_toggle_all)
+	
+	if root_window:
+		for c in get_children():
+			if c is CheckBox:
+				c.toggled.connect(root_window.on_checkbox_toggled.bind(c.text))
+
+func _toggle_all() -> void:
+	var all_pressed := true
+	for c in get_children():
+		if c is CheckBox:
+			if !c.button_pressed:
+				all_pressed = false
+				break
+	
+	for c in get_children():
+		if c is CheckBox:
+			if all_pressed: c.button_pressed = false
+			else: c.button_pressed = true
+"
+
+[sub_resource type="DPITexture" id="DPITexture_nlt83"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#ffdd65\" d=\"M8 2a1 1 0 0 0-.85.484l-6 10A1 1 0 0 0 2 14h12a1 1 0 0 0 .857-1.514l-6-10a1 1 0 0 0-.85-.484zM7 5h2v5H7zm0 6h2v2H7z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[node name="Window" type="Window" unique_id=1952370409]
+oversampling_override = 1.0
+title = "Godot Resource Cleaner"
+position = Vector2i(0, 36)
+size = Vector2i(720, 720)
+min_size = Vector2i(720, 720)
+script = SubResource("GDScript_3ebo7")
+
+[node name="Main" type="PanelContainer" parent="." unique_id=126090787]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Main" unique_id=178840607]
+self_modulate = Color(1, 1, 1, 0.8235294)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Main" unique_id=1963190170]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Main/MarginContainer" unique_id=1630857043]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Main/MarginContainer/VBoxContainer" unique_id=70584432]
+layout_mode = 2
+
+[node name="ButtonScan" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1140742963]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+text = "Scan"
+icon = SubResource("DPITexture_mvsta")
+
+[node name="ButtonKeepList" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer" unique_id=974379848]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+text = "Keep List"
+icon = SubResource("DPITexture_hjewq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Main/MarginContainer/VBoxContainer/HBoxContainer" unique_id=594559714]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Main/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1029886065]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Godot Resource Cleaner"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="LEFilter" type="LineEdit" parent="Main/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1796842331]
+layout_mode = 2
+placeholder_text = "Filter Files"
+clear_button_enabled = true
+
+[node name="ButtonClean" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer" unique_id=32676748]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+text = "Clean"
+icon = SubResource("DPITexture_nfq5s")
+
+[node name="ButtonSetting" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer" unique_id=258900860]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+text = "Settings"
+icon = SubResource("DPITexture_srjdr")
+
+[node name="Panel" type="Panel" parent="Main/MarginContainer/VBoxContainer" unique_id=351632105]
+self_modulate = Color(1, 1, 1, 0.39215687)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Main/MarginContainer/VBoxContainer/Panel" unique_id=2017380887]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxMain" type="VBoxContainer" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer" unique_id=1729930252]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=1396027373]
+layout_mode = 2
+text = "⚠️ Use With Caution ⚠️
+Deletion of files is permanent!
+Always make a backup of your project before using this tool.
+Even if a file has no visible dependencies, it may still be referenced.
+This tool can break your project. Use at your own risk!"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=1173150121]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=1183459383]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Label2" type="Label" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain/MarginContainer" unique_id=1207698579]
+layout_mode = 2
+text = "🔍 Scan: Scans the project for unused files with no known dependencies.
+🧹 Clean: Finds and removes orphaned .import, .uid files, and empty folders.
+📌 Keep List: Displays resources you want to preserve.
+⚙️ Settings: Customize the scan behavior if needed."
+
+[node name="HSeparator2" type="HSeparator" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=517202514]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=1136220165]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Label3" type="Label" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain/MarginContainer2" unique_id=312219487]
+layout_mode = 2
+text = "🛠️ How It Works
+- Press Scan to find unused resources.
+- Select the resources you want to keep or delete.
+- Use 📌 Keep to save them to the Keep List.
+- Use 🗑️ Delete to permanently remove them.
+- Optionally press 🧹 Clean to remove orphaned files and empty folders."
+
+[node name="HSeparator3" type="HSeparator" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=397381785]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="Main/MarginContainer/VBoxContainer/Panel/ScrollContainer/VBoxMain" unique_id=2045651791]
+visible = false
+layout_mode = 2
+text = "🛈 Godot Resource Cleaner v0.7.1
+Licensed under the MIT License.
+© 2026 FreeTimeDev"
+horizontal_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Main/MarginContainer/VBoxContainer" unique_id=74123329]
+layout_mode = 2
+alignment = 1
+
+[node name="ButtonKeep" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1136079144]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_hover_color = Color(0.333333, 1, 0.333333, 1)
+text = "Keep"
+icon = SubResource("DPITexture_4vd1n")
+
+[node name="ButtonDelete" type="Button" parent="Main/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=875448714]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_hover_color = Color(1, 0.333333, 0.333333, 1)
+text = "Delete"
+icon = SubResource("DPITexture_ifklg")
+
+[node name="Setting" type="PanelContainer" parent="." unique_id=79462303]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Setting" unique_id=1297606847]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Setting" unique_id=1493065444]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer" unique_id=1854079867]
+layout_mode = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer" unique_id=1534296793]
+layout_mode = 2
+
+[node name="ButtonDoneSetting" type="Button" parent="Setting/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1007246223]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+text = "Done"
+icon = SubResource("DPITexture_ygqcu")
+
+[node name="VSeparator" type="VSeparator" parent="Setting/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1398727509]
+visible = false
+layout_mode = 2
+
+[node name="ButtonSettingReset" type="Button" parent="Setting/MarginContainer/VBoxContainer/HBoxContainer" unique_id=963918155]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Reset"
+icon = SubResource("DPITexture_cv8km")
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer" unique_id=470803550]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Setting/MarginContainer/VBoxContainer" unique_id=1577496963]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1535738822]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FilterCheckButton" type="CheckButton" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1165768680]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Filter by Extensions"
+
+[node name="HBoxFilter" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1145416345]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter" unique_id=1165316794]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer" unique_id=974149593]
+layout_mode = 2
+
+[node name="ButtonImages" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=216528419]
+layout_mode = 2
+text = "Images"
+
+[node name="Images" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=1315263747 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../ButtonImages")
+
+[node name="png" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=58404565]
+layout_mode = 2
+text = ".png"
+
+[node name="svg" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=1452034871]
+layout_mode = 2
+text = ".svg"
+
+[node name="jpg" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=819527664]
+layout_mode = 2
+text = ".jpg"
+
+[node name="jpeg" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=726091124]
+layout_mode = 2
+text = ".jpeg"
+
+[node name="bmp" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=497751805]
+layout_mode = 2
+text = ".bmp"
+
+[node name="tga" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Images" unique_id=1260834923]
+layout_mode = 2
+text = ".tga"
+
+[node name="ButtonFonts" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=871620768]
+layout_mode = 2
+text = "Fonts"
+
+[node name="Fonts" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=1167759231 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../ButtonFonts")
+
+[node name="ttf" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Fonts" unique_id=1756072355]
+layout_mode = 2
+text = ".ttf"
+
+[node name="otf" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Fonts" unique_id=31545571]
+layout_mode = 2
+text = ".otf"
+
+[node name="ButtonGodot" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=230947072]
+layout_mode = 2
+text = "Godot"
+
+[node name="Godot" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer" unique_id=1083517464 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../ButtonGodot")
+
+[node name="gd" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Godot" unique_id=199697796]
+layout_mode = 2
+text = ".gd"
+
+[node name="tres" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Godot" unique_id=278190513]
+layout_mode = 2
+text = ".tres"
+
+[node name="res" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Godot" unique_id=728073905]
+layout_mode = 2
+text = ".res"
+
+[node name="tscn" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Godot" unique_id=46696086]
+layout_mode = 2
+text = ".tscn"
+
+[node name="gdshader" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer/VBoxContainer/Godot" unique_id=727365693]
+layout_mode = 2
+text = ".gdshader"
+
+[node name="MarginContainer2" type="MarginContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter" unique_id=1436639092]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2" unique_id=937376537]
+layout_mode = 2
+
+[node name="ButtonAudio" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=1018543488]
+layout_mode = 2
+text = "Audio"
+
+[node name="Audio" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=935611847 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../ButtonAudio")
+
+[node name="wav" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Audio" unique_id=1951599789]
+layout_mode = 2
+text = ".wav"
+
+[node name="mp3" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Audio" unique_id=2005759593]
+layout_mode = 2
+text = ".mp3"
+
+[node name="ogg" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Audio" unique_id=1800287944]
+layout_mode = 2
+text = ".ogg"
+
+[node name="Button3DModels" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=771671670]
+layout_mode = 2
+text = "3DModels"
+
+[node name="3DModels" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=1459249495 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../Button3DModels")
+
+[node name="gltf" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/3DModels" unique_id=1775224925]
+layout_mode = 2
+text = ".gltf"
+
+[node name="glb" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/3DModels" unique_id=693517395]
+layout_mode = 2
+text = ".glb"
+
+[node name="fbx" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/3DModels" unique_id=1257242844]
+layout_mode = 2
+text = ".fbx"
+
+[node name="obj" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/3DModels" unique_id=1885937543]
+layout_mode = 2
+text = ".obj"
+
+[node name="stl" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/3DModels" unique_id=1406093951]
+layout_mode = 2
+text = ".stl"
+
+[node name="ButtonSpecial" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=817995222]
+layout_mode = 2
+text = "Special"
+
+[node name="Special" type="GridContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer" unique_id=1347529972 node_paths=PackedStringArray("root_window", "button")]
+layout_mode = 2
+columns = 4
+script = SubResource("GDScript_6usdr")
+root_window = NodePath("../../../../../../../../..")
+button = NodePath("../ButtonSpecial")
+
+[node name="json" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=986742598]
+layout_mode = 2
+text = ".json"
+
+[node name="xml" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=1251679752]
+layout_mode = 2
+text = ".xml"
+
+[node name="csv" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=1370009845]
+layout_mode = 2
+text = ".csv"
+
+[node name="aseprite" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=283657021]
+layout_mode = 2
+text = ".aseprite"
+
+[node name="ase" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=886791195]
+layout_mode = 2
+text = ".ase"
+
+[node name="txt" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=975834508]
+layout_mode = 2
+text = ".txt"
+
+[node name="reapeaks" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=1641779502]
+layout_mode = 2
+text = ".reapeaks"
+
+[node name="tmp" type="CheckBox" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxFilter/MarginContainer2/VBoxContainer/Special" unique_id=1467192446]
+layout_mode = 2
+text = ".tmp"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1005776728]
+layout_mode = 2
+
+[node name="IgnoreCheckButton" type="CheckButton" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=452156552]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Ignore"
+
+[node name="VBoxIgnore" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=199153533]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore" unique_id=2002866557]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer" unique_id=598250495]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer" unique_id=1563665291]
+layout_mode = 2
+text = "Folders (i.e.: \"src\"):"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer" unique_id=662273806]
+layout_mode = 2
+
+[node name="TextEditIgnFolder" type="TextEdit" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=802467636]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Add Folder"
+scroll_fit_content_height = true
+
+[node name="Button" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=1161706083]
+layout_mode = 2
+text = "Add"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer" unique_id=54145075]
+layout_mode = 2
+
+[node name="VBoxIgnFolder" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer" unique_id=558682443]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer" unique_id=1248168894]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer" unique_id=880651495]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2" unique_id=443230457]
+layout_mode = 2
+text = "Extensions (i.e.: \".gd\"):"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2" unique_id=818182521]
+layout_mode = 2
+
+[node name="TextEditIgnExt" type="TextEdit" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1314079892]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Add Extension"
+scroll_fit_content_height = true
+
+[node name="Button" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1933814054]
+layout_mode = 2
+text = "Add"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2" unique_id=816099449]
+layout_mode = 2
+
+[node name="VBoxIgnExt" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2" unique_id=1546799381]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=911880180]
+layout_mode = 2
+
+[node name="UseMultithreadingCheckButton" type="CheckButton" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1410208925]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Enable Multithreading
+Speeds up file scanning by using multiple CPU cores
+Best for large projects with many files.
+
+Notes:
+• Increases CPU and memory usage during scans
+• Small projects may see little benefit
+• Disable if you encounter crashes or instability"
+button_pressed = true
+text = "Use Multithreading ⚠️"
+
+[node name="HSeparator3" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=774573157]
+layout_mode = 2
+
+[node name="ExcludeButton" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=454366199]
+unique_name_in_owner = true
+modulate = Color(1, 0.333333, 0.333333, 1)
+layout_mode = 2
+size_flags_horizontal = 4
+toggle_mode = true
+text = "Show Excluded"
+icon = SubResource("DPITexture_nlt83")
+
+[node name="VBoxExclude" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=599249603]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude" unique_id=494780798]
+layout_mode = 2
+text = "⚠️ Warning: These will be excluded from dependency checks ⚠️"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude" unique_id=1064871239]
+layout_mode = 2
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer" unique_id=1511401089]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer" unique_id=1473639360]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer" unique_id=785039429]
+layout_mode = 2
+text = "Folders:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer" unique_id=1707035690]
+layout_mode = 2
+
+[node name="TextEditExcFolder" type="TextEdit" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=291673695]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Add Folder"
+scroll_fit_content_height = true
+
+[node name="Button" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1346950717]
+layout_mode = 2
+text = "Add"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer" unique_id=666987437]
+layout_mode = 2
+
+[node name="VBoxFolder" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer" unique_id=2144202410]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer" unique_id=73397936]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer" unique_id=346163665]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2" unique_id=1140178347]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer" unique_id=2071871504]
+layout_mode = 2
+text = "Extensions:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer" unique_id=113510849]
+layout_mode = 2
+
+[node name="TextEditExcExt" type="TextEdit" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer" unique_id=1295246020]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Add Extension"
+scroll_fit_content_height = true
+
+[node name="Button" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer" unique_id=1526093842]
+layout_mode = 2
+text = "Add"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer" unique_id=639707035]
+layout_mode = 2
+
+[node name="VBoxExt" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer" unique_id=526291368]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VSeparator2" type="VSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer" unique_id=465527153]
+layout_mode = 2
+
+[node name="MarginContainer3" type="MarginContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer" unique_id=544083163]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3" unique_id=1404053435]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer" unique_id=1430889727]
+layout_mode = 2
+text = "If Contains String:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer" unique_id=493398931]
+layout_mode = 2
+
+[node name="TextEditExcContaining" type="TextEdit" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer/HBoxContainer" unique_id=1643859565]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Add String"
+scroll_fit_content_height = true
+
+[node name="Button" type="Button" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer/HBoxContainer" unique_id=352879539]
+layout_mode = 2
+text = "Add"
+
+[node name="HSeparator" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer" unique_id=1146657330]
+layout_mode = 2
+
+[node name="VBoxContains" type="VBoxContainer" parent="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer" unique_id=640236878]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="Setting/MarginContainer/VBoxContainer" unique_id=1732458781]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Setting/MarginContainer/VBoxContainer" unique_id=385350480]
+layout_mode = 2
+size_flags_vertical = 8
+text = "🛈 Godot Resource Cleaner v0.7.1
+Licensed under the MIT License.
+© 2026 FreeTimeDev"
+horizontal_alignment = 1
+
+[node name="KeepList" type="PanelContainer" parent="." unique_id=133687493]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="KeepList" unique_id=9334472]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="KeepList" unique_id=1843795451]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="KeepList/MarginContainer" unique_id=436924889]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="KeepList/MarginContainer/VBoxContainer" unique_id=130723897]
+layout_mode = 2
+
+[node name="ButtonDoneKL" type="Button" parent="KeepList/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1829780970]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Done"
+icon = SubResource("DPITexture_ygqcu")
+
+[node name="VSeparator" type="VSeparator" parent="KeepList/MarginContainer/VBoxContainer/HBoxContainer" unique_id=338929717]
+layout_mode = 2
+
+[node name="ButtonRemoveAll" type="Button" parent="KeepList/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1861148899]
+unique_name_in_owner = true
+layout_mode = 2
+text = " All "
+icon = SubResource("DPITexture_ifklg")
+
+[node name="HSeparator" type="HSeparator" parent="KeepList/MarginContainer/VBoxContainer" unique_id=1927478286]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="KeepList/MarginContainer/VBoxContainer" unique_id=656726854]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="KeepList/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1210367252]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxKeepList" type="VBoxContainer" parent="KeepList/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer" unique_id=1141997920]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=2093188316]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.019607844, 0.019607844, 0.019607844, 0.8)
+
+[node name="PanelContainer" type="PanelContainer" parent="Overlay" unique_id=1398768371]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -64.0
+offset_right = 210.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Overlay/PanelContainer" unique_id=1663826024]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Overlay/PanelContainer/Panel" unique_id=2022771357]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ProgressContainer" type="VBoxContainer" parent="Overlay/PanelContainer/Panel/MarginContainer" unique_id=1416542511]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="ProgressLabel" type="Label" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer" unique_id=1461366398]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Scan complete!"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer" unique_id=1210742771]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+value = 100.0
+
+[node name="HSeparator" type="HSeparator" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer" unique_id=948353019]
+layout_mode = 2
+
+[node name="CancelButton" type="Button" parent="Overlay/PanelContainer/Panel/MarginContainer/ProgressContainer" unique_id=2128345424]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Cancel"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="." unique_id=2006658312]
+unique_name_in_owner = true
+oversampling_override = 1.0
+initial_position = 2
+size = Vector2i(360, 180)
+unresizable = true
+ok_button_text = "Delete"
+dialog_text = "Are you sure you want to permanently delete the selected files? This action cannot be undone."
+dialog_autowrap = true
+
+[node name="ConfirmationDialogClean" type="ConfirmationDialog" parent="." unique_id=1949927794]
+unique_name_in_owner = true
+auto_translate_mode = 1
+oversampling_override = 1.0
+initial_position = 2
+size = Vector2i(360, 185)
+unresizable = true
+ok_button_text = "Clean"
+dialog_autowrap = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfirmationDialogClean" unique_id=647167683]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -49.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ConfirmationDialogClean/VBoxContainer" unique_id=354922455]
+layout_mode = 2
+text = "Clean..."
+
+[node name="CBImport" type="CheckBox" parent="ConfirmationDialogClean/VBoxContainer" unique_id=352620001]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Orphaned .import"
+
+[node name="CBUid" type="CheckBox" parent="ConfirmationDialogClean/VBoxContainer" unique_id=345367648]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Orphaned .uid"
+
+[node name="CBFolders" type="CheckBox" parent="ConfirmationDialogClean/VBoxContainer" unique_id=774630087]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Empty folders"
+
+[node name="ConfirmationDialogKLRemoveAll" type="ConfirmationDialog" parent="." unique_id=495151900]
+unique_name_in_owner = true
+auto_translate_mode = 1
+oversampling_override = 1.0
+initial_position = 2
+size = Vector2i(360, 180)
+unresizable = true
+ok_button_text = "Remove All"
+dialog_text = "Are you sure you want to remove all files from the Keep List?"
+dialog_autowrap = true
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer/ButtonScan" to="." method="_on_button_scan_pressed"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer/ButtonKeepList" to="." method="_on_button_keep_list_pressed"]
+[connection signal="text_changed" from="Main/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LEFilter" to="." method="_on_le_filter_text_changed"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer/ButtonClean" to="." method="_on_button_clean_pressed"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer/ButtonSetting" to="." method="_on_button_setting_pressed"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer2/ButtonKeep" to="." method="_on_button_keep_pressed"]
+[connection signal="pressed" from="Main/MarginContainer/VBoxContainer/HBoxContainer2/ButtonDelete" to="." method="_on_button_delete_pressed"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/HBoxContainer/ButtonDoneSetting" to="." method="_on_button_done_pressed"]
+[connection signal="toggled" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FilterCheckButton" to="." method="_on_check_button_toggled"]
+[connection signal="toggled" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/IgnoreCheckButton" to="." method="_on_ignore_check_button_toggled"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_ign_folder_pressed"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxIgnore/HBoxContainer/VBoxContainer2/HBoxContainer/Button" to="." method="_on_button_ign_ext_pressed"]
+[connection signal="toggled" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/UseMultithreadingCheckButton" to="." method="_on_use_multithreading_check_button_toggled"]
+[connection signal="toggled" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExcludeButton" to="." method="_on_exclude_check_button_toggled"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_exclude_folder_pressed"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_exclude_ext_pressed"]
+[connection signal="pressed" from="Setting/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/VBoxExclude/HBoxContainer/MarginContainer3/VBoxContainer/HBoxContainer/Button" to="." method="_on_button_exclude_cont_pressed"]
+[connection signal="pressed" from="KeepList/MarginContainer/VBoxContainer/HBoxContainer/ButtonDoneKL" to="." method="_on_button_done_kl_pressed"]
+[connection signal="pressed" from="KeepList/MarginContainer/VBoxContainer/HBoxContainer/ButtonRemoveAll" to="." method="_on_button_remove_all_pressed"]
+[connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]
+[connection signal="confirmed" from="ConfirmationDialogClean" to="." method="_on_confirmation_dialog_clean_confirmed"]
+[connection signal="confirmed" from="ConfirmationDialogKLRemoveAll" to="." method="_on_confirmation_dialog_kl_remove_all_confirmed"]

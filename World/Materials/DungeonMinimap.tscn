@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://ckqw4rtpywb0i"]
+
+[ext_resource type="Script" uid="uid://cjkn0u3vwjf7y" path="res://World/Materials/minimap_display.gd" id="1_h3jba"]
+
+[node name="DungeonMinimap" type="CanvasLayer" unique_id=260080673]
+
+[node name="MinimapRoot" type="Control" parent="." unique_id=1619169164]
+layout_mode = 3
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -110.0
+offset_bottom = 110.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="MinimapDisplay" type="Control" parent="MinimapRoot" unique_id=914956949]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -110.0
+offset_bottom = 110.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("1_h3jba")

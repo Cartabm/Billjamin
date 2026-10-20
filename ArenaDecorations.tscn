@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bpmg3b5xyly5i"]
+
+[node name="ArenaDecorations" type="Node3D" unique_id=348322772]
+
+[node name="TerrainVisuals" type="Node3D" parent="." unique_id=945824974]
+
+[node name="Ruins" type="Node3D" parent="." unique_id=1137677430]
+
+[node name="Nature" type="Node3D" parent="." unique_id=1083469250]
+
+[node name="GroundDetails" type="Node3D" parent="." unique_id=909061945]
+
+[node name="Atmosphere" type="Node3D" parent="." unique_id=1389339588]

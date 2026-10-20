@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b582wkje0igd2"]
+
+[ext_resource type="Script" uid="uid://dir4ui34qjvis" path="res://World/Rooms/dungeon_gate.gd" id="1_gate"]
+
+[node name="DungeonGate" type="Node3D" unique_id=182827143]
+script = ExtResource("1_gate")

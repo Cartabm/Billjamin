@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c4sx457y7y66m"]
+
+[ext_resource type="Texture2D" uid="uid://dy2qvuo1ercb8" path="res://Assets/Textures/Terrain/Ground110.png" id="1_4vgu3"]
+[ext_resource type="Texture2D" uid="uid://degpls801nd8w" path="res://Assets/Textures/Terrain/Ground110_1K-JPG_Roughness.jpg" id="2_0oprj"]
+
+[resource]
+albedo_color = Color(0.1882353, 0.19215687, 0.22352941, 1)
+albedo_texture = ExtResource("1_4vgu3")
+roughness_texture = ExtResource("2_0oprj")
+uv1_scale = Vector3(50, 50, 1)
