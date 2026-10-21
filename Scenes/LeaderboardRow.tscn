@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://ju1vl1afnspl"]
+
+[ext_resource type="Script" uid="uid://dndklo8mtxp4m" path="res://Scripts/LeaderboardRow.gd" id="1_jm0v7"]
+
+[node name="LeaderboardRow" type="PanelContainer" unique_id=1720376488]
+custom_minimum_size = Vector2(0, 46)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_jm0v7")
+
+[node name="RowMargin" type="MarginContainer" parent="." unique_id=2122110029]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="RowMargin" unique_id=1174731545]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RankLabel" type="Label" parent="RowMargin/Columns" unique_id=1656611681]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="RowMargin/Columns" unique_id=1202667353]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="KillsLabel" type="Label" parent="RowMargin/Columns" unique_id=255764453]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="LevelLabel" type="Label" parent="RowMargin/Columns" unique_id=787949071]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="RowMargin/Columns" unique_id=1924288205]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="RowMargin/Columns" unique_id=1406058341]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+horizontal_alignment = 2

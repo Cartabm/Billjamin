@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://0l2b1hopu6my"]
+
+[ext_resource type="Script" uid="uid://bboov61wm0l3o" path="res://Scripts/training_dummy.gd" id="1_7knb0"]
+[ext_resource type="PackedScene" uid="uid://cbkrg7x0m3dis" path="res://Scenes/demon_2.tscn" id="2_a3bbp"]
+[ext_resource type="PackedScene" uid="uid://5d0m082o4k2l" path="res://Assets/Enemies/drive-download-20261014T042636Z-1-001/Big/glTF/Ninja.gltf" id="3_yb3ki"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ap0u0"]
+albedo_color = Color(0.978085, 0, 0.079182096, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ek0cf"]
+height = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(1, 0.12, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_prtu8"]
+albedo_color = Color(0.6204508, 0.2153762, 0.015175914, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oomdq"]
+albedo_color = Color(0.3212404, 0.7702119, 0.42425916, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jni1y"]
+size = Vector3(0.9, 0.08, 0.05)
+
+[node name="Enemy" type="CharacterBody3D" unique_id=394797931]
+script = ExtResource("1_7knb0")
+
+[node name="MonsterVisual" parent="." unique_id=345412314 instance=ExtResource("2_a3bbp")]
+transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
+
+[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=1583117048]
+visible = false
+
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1267743977]
+bones/1/position = Vector3(0.3519203, 0.0727973, -0.457257)
+bones/1/rotation = Quaternion(6.1599435e-06, 0.68542606, 0.7281423, 1.4452308e-05)
+bones/2/position = Vector3(0.0034563416, 0.8202857, 0.24707782)
+bones/2/rotation = Quaternion(-0.0005134229, 0.00269969, 2.4635854e-05, 0.99999624)
+bones/4/rotation = Quaternion(0.07463381, 4.3678227e-07, 4.6128083e-08, 0.99721104)
+bones/5/rotation = Quaternion(0.09838341, -0.08139894, 0.042685878, 0.990895)
+bones/6/rotation = Quaternion(0.35323146, -3.084279e-05, 0.00013831882, 0.935536)
+bones/7/rotation = Quaternion(-0.31110606, -0.00026214274, 8.535855e-05, 0.9503752)
+bones/8/position = Vector3(0.17888486, 0.25425798, -0.019721009)
+bones/8/rotation = Quaternion(-0.124178685, -0.055804353, -0.40609175, 0.9036344)
+bones/9/rotation = Quaternion(0.060677476, 0.29580334, 0.7156403, -0.6298235)
+bones/10/rotation = Quaternion(0.1369826, 0.20268999, -0.21693335, 0.94503576)
+bones/22/position = Vector3(-0.17881374, 0.2541612, -0.019762175)
+bones/22/rotation = Quaternion(-0.1241784, 0.05580493, 0.40609175, 0.9036343)
+bones/23/rotation = Quaternion(-0.29581705, -0.25083458, 0.66773236, 0.6353801)
+bones/24/rotation = Quaternion(0.15716322, 0.005492389, 0.08219504, 0.98413086)
+bones/26/rotation = Quaternion(-0.35208493, 0.039951842, 0.26151595, 0.8978026)
+bones/27/rotation = Quaternion(-0.6248765, -0.06210559, -0.061027613, 0.7758531)
+bones/29/rotation = Quaternion(-0.51045364, -0.020178618, 0.08611934, 0.855344)
+bones/30/rotation = Quaternion(-0.52709943, -0.034914598, 0.071548775, 0.84606624)
+bones/32/rotation = Quaternion(-0.37396547, -0.014268689, -0.14329857, 0.9161942)
+bones/33/rotation = Quaternion(-0.63640654, -0.026933417, 0.16093616, 0.7538972)
+bones/35/rotation = Quaternion(-0.68594, -0.16904004, -0.27099288, 0.6538155)
+bones/36/position = Vector3(0.3395238, 0.0011797012, -0.15161456)
+bones/36/rotation = Quaternion(0.9642368, 0.0128202615, 0.0013039871, -0.2647291)
+bones/37/rotation = Quaternion(0.092674516, 0.0019846226, 0.010409338, 0.99564004)
+bones/38/position = Vector3(-0.3412068, 0.0011797006, -0.15161504)
+bones/38/rotation = Quaternion(0.8765632, -0.012120383, 0.0011721218, 0.48113286)
+bones/39/rotation = Quaternion(0.31928724, -0.0043265997, -0.009673393, 0.9475988)
+bones/41/position = Vector3(-0.34929794, 0.11403547, 0.6262628)
+bones/41/rotation = Quaternion(-1.1940042e-05, 0.8794672, 0.47595972, -1.0840305e-05)
+
+[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=107495399]
+autoplay = &"Walk"
+
+[node name="Ninja2" parent="MonsterVisual" unique_id=2041443202 instance=ExtResource("3_yb3ki")]
+
+[node name="Skeleton3D" parent="MonsterVisual/Ninja2/CharacterArmature" parent_id_path=PackedInt32Array(2041443202, 299997972) index="0" unique_id=1383976121]
+bones/2/rotation = Quaternion(-3.5526934e-15, 1.1920933e-07, -8.470341e-22, 1)
+bones/4/rotation = Quaternion(0.16683148, 4.3189968e-07, 1.0312019e-07, 0.9859854)
+bones/5/rotation = Quaternion(0.09618958, -8.2847305e-07, 2.1512411e-08, 0.99536306)
+bones/6/rotation = Quaternion(0.35192484, 9.694014e-07, 1.5023394e-07, 0.9360283)
+bones/7/rotation = Quaternion(-0.39071867, -0.000253907, 0.00010720164, 0.9205101)
+bones/8/rotation = Quaternion(-0.13449621, -0.032737724, -0.40912697, 0.9019169)
+bones/9/rotation = Quaternion(0.4946222, 0.5018445, 0.50719804, -0.4962369)
+bones/10/rotation = Quaternion(0.014786737, 0.2671226, -0.17426822, 0.94765896)
+bones/22/rotation = Quaternion(-0.13449596, 0.032738276, 0.40912706, 0.9019169)
+bones/23/rotation = Quaternion(-0.49462223, 0.50184447, 0.5071981, 0.49623692)
+bones/24/rotation = Quaternion(0.014786714, -0.26712275, 0.17426829, 0.9476589)
+bones/26/rotation = Quaternion(-0.028374808, 0.0048223464, 0.16748145, 0.98545504)
+bones/27/rotation = Quaternion(-0.106641375, 0.0009219516, -0.008596527, 0.99426)
+bones/29/rotation = Quaternion(-0.11277086, -0.0007699362, -0.014514985, 0.9935147)
+bones/30/rotation = Quaternion(0.020557418, 0.0009909464, 0.0012504208, 0.99978745)
+bones/32/rotation = Quaternion(0.04225404, -0.02564165, -0.23230457, 0.9713865)
+bones/33/rotation = Quaternion(-0.07661224, 0.001527048, 0.01986751, 0.9968618)
+bones/35/rotation = Quaternion(-0.011628242, -0.002523484, -0.2121925, 0.97715545)
+bones/36/rotation = Quaternion(0.9650399, 0.008726846, 0.002116638, 0.26194903)
+bones/37/rotation = Quaternion(0.5170186, 0.0063198637, 0.008506167, 0.85590863)
+bones/38/rotation = Quaternion(0.96504, -0.008726946, -0.0021157695, 0.26194897)
+bones/39/rotation = Quaternion(0.5170186, -0.0063198856, -0.008506201, 0.8559086)
+bones/40/rotation = Quaternion(-3.5526934e-15, 1.1920937e-07, -8.470344e-22, 1)
+bones/41/rotation = Quaternion(-1.207786e-05, 0.7058064, 0.70840484, -1.1664422e-05)
+bones/42/rotation = Quaternion(-3.552734e-15, -5.9604645e-07, 3.3881257e-21, 1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1886881137]
+visible = false
+mesh = SubResource("CapsuleMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_ap0u0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=601162159]
+shape = SubResource("CapsuleShape3D_ek0cf")
+
+[node name="HealthBar" type="Node3D" parent="." unique_id=1222438187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="BarBackground" type="MeshInstance3D" parent="HealthBar" unique_id=689025918]
+mesh = SubResource("BoxMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_prtu8")
+
+[node name="BarFill" type="MeshInstance3D" parent="HealthBar" unique_id=1033002703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.03)
+material_override = SubResource("StandardMaterial3D_oomdq")
+mesh = SubResource("BoxMesh_jni1y")
+
+[editable path="MonsterVisual"]
+[editable path="MonsterVisual/Ninja2"]

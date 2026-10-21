@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://kutq706elh82"]
+
+[ext_resource type="Texture2D" uid="uid://ckgqapg5ep8ts" path="res://Art/Environment/Floors/Seamless Pixel Art Dungeon Cobblestone.png" id="1_p2cne"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_86en2"]
+albedo_texture = ExtResource("1_p2cne")
+uv1_scale = Vector3(10, 10, 1)
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+material = SubResource("StandardMaterial3D_86en2")
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(20, 0.2, 20)
+
+[node name="FloorTile" type="StaticBody3D" unique_id=1839944713]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1953519559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2066550638]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("BoxShape3D_ap0u0")

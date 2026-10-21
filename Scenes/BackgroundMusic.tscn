@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bewea2hgsewn"]
+
+[ext_resource type="Script" uid="uid://ciyj6orykerkf" path="res://Scripts/background_music.gd" id="2_rd0vy"]
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" unique_id=2002742408]
+process_mode = 3
+autoplay = true
+bus = &"Music"
+script = ExtResource("2_rd0vy")

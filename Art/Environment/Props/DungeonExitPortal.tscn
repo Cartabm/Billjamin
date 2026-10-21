@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://nw6pev4wvqhq"]
+
+[ext_resource type="Script" uid="uid://ce6nuf841o21d" path="res://Scripts/Environment/dungeon_exit_portal.gd" id="1_script"]
+
+[sub_resource type="CylinderMesh" id="BaseMesh"]
+top_radius = 1.15
+bottom_radius = 1.3
+height = 0.25
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="BaseMat"]
+albedo_color = Color(0.14, 0.17, 0.23, 1)
+metallic = 0.35
+roughness = 0.7
+
+[sub_resource type="TorusMesh" id="RingMesh"]
+inner_radius = 0.7
+outer_radius = 0.95
+rings = 16
+ring_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="GlowMat"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.15, 0.82, 1, 1)
+
+[sub_resource type="SphereMesh" id="CoreMesh"]
+radius = 0.65
+height = 1.3
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="CoreMat"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.55, 1, 0.4)
+
+[sub_resource type="SphereShape3D" id="InteractionShape"]
+radius = 2.2
+
+[node name="DungeonExitPortal" type="Node3D" unique_id=446486116]
+script = ExtResource("1_script")
+
+[node name="PortalVisual" type="Node3D" parent="." unique_id=422453047]
+
+[node name="Pedestal" type="MeshInstance3D" parent="PortalVisual" unique_id=1062844535]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0)
+mesh = SubResource("BaseMesh")
+surface_material_override/0 = SubResource("BaseMat")
+
+[node name="PortalRing" type="MeshInstance3D" parent="PortalVisual" unique_id=334406621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+mesh = SubResource("RingMesh")
+surface_material_override/0 = SubResource("GlowMat")
+
+[node name="PortalCore" type="MeshInstance3D" parent="PortalVisual" unique_id=1133907288]
+transform = Transform3D(0.95, 0, 0, 0, 1.25, 0, 0, 0, 0.28, 0, 1.35, 0)
+mesh = SubResource("CoreMesh")
+surface_material_override/0 = SubResource("CoreMat")
+
+[node name="InteractionArea" type="Area3D" parent="." unique_id=1025504890]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea" unique_id=965155918]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("InteractionShape")
+
+[node name="InteractionPrompt" type="Label3D" parent="." unique_id=1548907550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, 0)
+visible = false
+billboard = 1
+no_depth_test = true
+text = "Press [E] to Return to Overworld"
+font_size = 30
+outline_size = 10

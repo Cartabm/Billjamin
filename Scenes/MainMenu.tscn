@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://bywwp6gfw1qkh"]
+
+[ext_resource type="Script" uid="uid://d30kfbh7qsmnk" path="res://Scripts/main_menu.gd" id="1_i26rj"]
+[ext_resource type="Texture2D" uid="uid://d0oola7a4uypp" path="res://Assets/Images/Title.jpg" id="2_h7a2f"]
+[ext_resource type="FontFile" uid="uid://bgal68bxxyo8b" path="res://Assets/Font/IMFellEnglishSC-Regular.ttf" id="3_qoqlk"]
+
+[node name="MainMenu" type="Control" unique_id=1804530850]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_i26rj")
+
+[node name="TitleBackground" type="TextureRect" parent="." unique_id=1100349039]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_h7a2f")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=605047922]
+layout_mode = 0
+offset_left = 1690.0
+offset_top = 762.0
+offset_right = 1923.0
+offset_bottom = 1077.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1660446247]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="GameTitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1759616467]
+layout_mode = 2
+text = "Probably a waste of time"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1711834533]
+layout_mode = 2
+text = "dont expect much"
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=984194403]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86023086, 0.8966497, 0.7430402, 1)
+theme_override_fonts/font = ExtResource("3_qoqlk")
+theme_override_font_sizes/font_size = 25
+text = "Play, I guess.
+"
+
+[node name="OptionsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1240475851]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85882354, 0.8980392, 0.7411765, 1)
+theme_override_fonts/font = ExtResource("3_qoqlk")
+text = "Options"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=831026706]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85882354, 0.8980392, 0.7411765, 1)
+theme_override_fonts/font = ExtResource("3_qoqlk")
+text = "Wasted my time here.
+"
+
+[node name="TestCloudSaveButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1795308198]
+visible = false
+layout_mode = 2
+text = "Test Cloud Save"

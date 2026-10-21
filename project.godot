@@ -30,6 +30,10 @@ CheddaBoards="*res://addons/cheddaboards/CheddaBoards.gd"
 LeaderboardService="*uid://bnms63godtsv4"
 BackgroundMusic="*uid://bewea2hgsewn"
 PlayerService="*uid://b2kc6r1f70sf5"
+ProjectilePool="*uid://cqe3nqn0r108r"
+DungeonReturnState="*uid://b7f56o6qmswp0"
+CharacterManager="*uid://b0yqlf3ru01v4"
+RunUpgradeState="*uid://suxarstpjoe8"
 
 [display]
 
@@ -70,4 +74,5 @@ dodge={
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"

@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b2r3vigbl6ubo"]
+
+[ext_resource type="Texture2D" uid="uid://67y7ft02ok8e" path="res://Art/Environment/Walls/WallTop_Cap.png" id="1_lmhie"]
+
+[resource]
+albedo_texture = ExtResource("1_lmhie")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 0

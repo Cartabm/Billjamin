@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dmvomaepjpotw"]
+
+[ext_resource type="Script" uid="uid://cqs6cuq02xp4w" path="res://Scripts/character_select.gd" id="1_1hnkh"]
+
+[node name="CharacterSelect" type="Control" unique_id=1020253497]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1hnkh")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=353565329]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=167894246]
+layout_mode = 2
+
+[node name="ArcherButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=139682670]
+layout_mode = 2
+text = "Play Ranged"
+
+[node name="RogueButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=759324537]
+layout_mode = 2
+text = "Play Lilrock819"
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=706781510]
+layout_mode = 2
+text = "Back"

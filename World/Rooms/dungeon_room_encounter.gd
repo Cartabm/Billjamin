@@ -1,4 +1,3 @@
-
 extends Node3D
 
 signal encounter_started
@@ -6,17 +5,23 @@ signal encounter_completed
 signal progress_changed(kills: int, required: int)
 
 @export var kills_required: int = 30
-@export var max_alive: int = 30
+@export var max_alive: int = 12
 @export var spawn_interval: float = 0.8
+
+@export_group("Spawn Pacing")
+@export var initial_spawn_count: int = 6
+@export var enemies_per_spawn_tick: int = 2
+
 @export var enemy_spawn_height: float = 0.75
 @export var enemy_scenes: Array[PackedScene] = []
 
 @export_group("Room Difficulty Scaling")
-@export var health_increase_per_room: float = 0.4025
+@export var health_increase_per_room: float = 0.15
 @export var damage_increase_per_room: float = 0.0575
-@export var enemy_count_increase_per_room: float = 0.23
-@export var extra_alive_every_rooms: int = 1
-@export var spawn_speed_increase_per_room: float = 0.115
+@export var enemy_count_increase_per_room: float = 0.10
+@export var extra_alive_every_rooms: int = 3
+@export var spawn_speed_increase_per_room: float = 0.05
+@export var minimum_spawn_interval: float = 0.15
 
 var kills_completed: int = 0
 var encounter_active: bool = false
@@ -58,7 +63,7 @@ func set_room_difficulty(level: int) -> void:
 		max_alive += extra_rooms / extra_alive_every_rooms
 
 	spawn_interval = maxf(
-		0.15,
+		minimum_spawn_interval,
 		spawn_interval / (
 			1.0 + float(extra_rooms) * spawn_speed_increase_per_room
 		)
@@ -72,9 +77,7 @@ func start_encounter() -> void:
 		return
 
 	if enemy_scenes.is_empty():
-		push_warning(
-			"RoomEncounter: Assign at least one enemy scene in DungeonGeneratorTest Inspector."
-		)
+		push_warning("RoomEncounter: Assign at least one enemy scene.")
 		return
 
 	encounter_active = true
@@ -84,11 +87,14 @@ func start_encounter() -> void:
 	_living_enemies.clear()
 
 	for gate in door_gates:
-		gate.close_gate()
+		if is_instance_valid(gate):
+			gate.close_gate()
 
 	progress_changed.emit(kills_completed, kills_required)
 	encounter_started.emit()
-	_fill_slots()
+
+	_spawn_enemies(initial_spawn_count)
+	_spawn_timer = spawn_interval
 
 
 func _physics_process(delta: float) -> void:
@@ -102,11 +108,11 @@ func _physics_process(delta: float) -> void:
 	_spawn_timer -= delta
 
 	if _spawn_timer <= 0.0:
-		_fill_slots()
+		_spawn_enemies(enemies_per_spawn_tick)
 		_spawn_timer = spawn_interval
 
 
-func _fill_slots() -> void:
+func _spawn_enemies(amount: int) -> void:
 	_living_enemies = _living_enemies.filter(
 		func(e: CharacterBody3D) -> bool:
 			return is_instance_valid(e) \
@@ -114,11 +120,23 @@ func _fill_slots() -> void:
 				and not e.is_dying
 	)
 
-	while encounter_active \
-	and _living_enemies.size() < max_alive \
-	and _spawned_count < kills_required:
-		_spawn_one()
+	var available_slots: int = maxi(
+		0,
+		max_alive - _living_enemies.size()
+	)
 
+	var remaining_enemies: int = maxi(
+		0,
+		kills_required - _spawned_count
+	)
+
+	var spawn_amount: int = mini(
+		maxi(amount, 0),
+		mini(available_slots, remaining_enemies)
+	)
+
+	for i in range(spawn_amount):
+		_spawn_one()
 
 
 func _spawn_one() -> void:
@@ -138,39 +156,30 @@ func _spawn_one() -> void:
 		randf_range(-6.0, 6.0)
 	)
 
-	# Apply room scaling before entering the scene tree.
-	if _difficulty_applied:
-		if _has_property(enemy, "max_health"):
-			enemy.max_health = maxi(
-				1,
-				roundi(float(enemy.max_health) * _health_multiplier)
-			)
+	# Apply room scaling before enemy._ready().
+	if _has_property(enemy, "max_health"):
+		enemy.set(
+			"max_health",
+			maxi(1, roundi(float(enemy.get("max_health")) * _health_multiplier))
+		)
 
-		if _has_property(enemy, "contact_damage"):
-			enemy.contact_damage = maxi(
-				1,
-				roundi(float(enemy.contact_damage) * _damage_multiplier)
-			)
+	var damage_properties: Array[String] = [
+		"contact_damage",
+		"charger_punch_damage",
+		"stalker_attack_damage",
+		"brute_attack_damage",
+		"punch_damage",
+		"attack_damage",
+		"ranged_attack_damage"
+	]
 
-		if _has_property(enemy, "punch_damage"):
-			enemy.punch_damage = maxi(
-				1,
-				roundi(float(enemy.punch_damage) * _damage_multiplier)
-			)
-
-		if _has_property(enemy, "attack_damage"):
-			enemy.attack_damage = maxi(
-				1,
-				roundi(float(enemy.attack_damage) * _damage_multiplier)
-			)
-
-		# Ranged enemy projectile damage scaling.
-		if _has_property(enemy, "ranged_attack_damage"):
-			enemy.ranged_attack_damage = maxi(
-				1,
-				roundi(
-					float(enemy.ranged_attack_damage)
-					* _damage_multiplier
+	for property_name in damage_properties:
+		if _has_property(enemy, property_name):
+			enemy.set(
+				property_name,
+				maxi(
+					1,
+					roundi(float(enemy.get(property_name)) * _damage_multiplier)
 				)
 			)
 
@@ -207,8 +216,7 @@ func register_kill() -> void:
 
 	if kills_completed >= kills_required:
 		complete_encounter()
-	else:
-		_spawn_timer = spawn_interval
+
 
 
 func complete_encounter() -> void:
@@ -219,6 +227,7 @@ func complete_encounter() -> void:
 	encounter_cleared = true
 
 	for gate in door_gates:
-		gate.open_gate()
+		if is_instance_valid(gate):
+			gate.open_gate()
 
 	encounter_completed.emit()

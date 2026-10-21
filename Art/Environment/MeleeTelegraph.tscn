@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://b11njyi1ro1ek"]
+
+[ext_resource type="Script" uid="uid://dkstjmsbpeeac" path="res://Art/Environment/melee_telegraph.gd" id="1_hyxp1"]
+[ext_resource type="Texture2D" uid="uid://c784y6cu242f6" path="res://Assets/Textures/Combat/RogueTelegraph_Boarder.png" id="2_myl3a"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lsh3x"]
+transparency = 1
+cull_mode = 2
+depth_draw_mode = 2
+shading_mode = 0
+albedo_texture = ExtResource("2_myl3a")
+texture_filter = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ek0cf"]
+size = Vector2(5, 2.5)
+
+[node name="MeleeTelegraph" type="MeshInstance3D" unique_id=1614960480]
+script = ExtResource("1_hyxp1")
+
+[node name="BoarderArtwork" type="MeshInstance3D" parent="." unique_id=1874132102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -1.25)
+visible = false
+material_override = SubResource("StandardMaterial3D_lsh3x")
+mesh = SubResource("PlaneMesh_ek0cf")

@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://ch003kswtqexp"]
+
+[ext_resource type="Texture2D" uid="uid://dvr6o1006kl12" path="res://Assets/Textures/Terrain/Seamless Pixel-Art Bark Texture.png" id="1_6degy"]
+[ext_resource type="Texture2D" uid="uid://c4xn63t2us3qi" path="res://Assets/Textures/Terrain/Seamless Pixel Art Tree Canopy.png" id="2_4xlb7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4xlb7"]
+albedo_texture = ExtResource("1_6degy")
+uv1_scale = Vector3(2, 2, 2)
+texture_filter = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ek0cf"]
+top_radius = 0.35
+bottom_radius = 0.55
+height = 3.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6degy"]
+top_radius = 0.35
+bottom_radius = 0.2
+height = 3.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4xlb7"]
+load_path = "res://.godot/imported/Seamless Pixel-Art Bark Texture.png-66f5668a929b5f29ddafcefa7c342dae.s3tc.ctex"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b38df"]
+albedo_texture = SubResource("CompressedTexture2D_4xlb7")
+uv1_scale = Vector3(5, 5, 5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4xlb7"]
+top_radius = 0.35
+bottom_radius = 0.2
+height = 3.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_prtu8"]
+lightmap_size_hint = Vector2i(64, 25)
+radius = 2.0
+height = 3.0
+radial_segments = 8
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ic7ae"]
+albedo_texture = ExtResource("2_4xlb7")
+uv1_scale = Vector3(3, 3, 3)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jni1y"]
+radius = 1.5
+height = 2.5
+radial_segments = 10
+rings = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2bqsg"]
+albedo_texture = ExtResource("2_4xlb7")
+uv1_scale = Vector3(3, 3, 3)
+
+[sub_resource type="SphereMesh" id="SphereMesh_oomdq"]
+radius = 1.5
+height = 2.5
+radial_segments = 8
+rings = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smknr"]
+albedo_texture = ExtResource("2_4xlb7")
+uv1_scale = Vector3(3, 3, 3)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ap0u0"]
+height = 3.0
+radius = 0.55
+
+[node name="Tree_Oak" type="Node3D" unique_id=1879844300]
+
+[node name="Trunk" type="MeshInstance3D" parent="." unique_id=415529770]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+material_override = SubResource("StandardMaterial3D_4xlb7")
+mesh = SubResource("CylinderMesh_ek0cf")
+
+[node name="Trunk2" type="MeshInstance3D" parent="." unique_id=511468800]
+transform = Transform3D(0.55233914, 0.83361953, 0, -0.83361953, 0.55233914, 0, 0, 0, 1, 1.1707507, 2.362418, 0)
+material_override = SubResource("StandardMaterial3D_4xlb7")
+mesh = SubResource("CylinderMesh_6degy")
+surface_material_override/0 = SubResource("StandardMaterial3D_b38df")
+
+[node name="Trunk3" type="MeshInstance3D" parent="." unique_id=923041225]
+transform = Transform3D(0.7256554, -0.68805814, 0, 0.68805814, 0.7256554, 0, 0, 0, 1, -0.6922622, 1.7235429, 0)
+material_override = SubResource("StandardMaterial3D_4xlb7")
+mesh = SubResource("CylinderMesh_4xlb7")
+
+[node name="Canopy" type="Node3D" parent="." unique_id=1322876960]
+
+[node name="FoliageCenter" type="MeshInstance3D" parent="Canopy" unique_id=452502939]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+mesh = SubResource("SphereMesh_prtu8")
+surface_material_override/0 = SubResource("StandardMaterial3D_ic7ae")
+
+[node name="FoliageLeft" type="MeshInstance3D" parent="Canopy" unique_id=1807925486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 3.3, 0.3)
+mesh = SubResource("SphereMesh_jni1y")
+surface_material_override/0 = SubResource("StandardMaterial3D_2bqsg")
+
+[node name="FoliageRight" type="MeshInstance3D" parent="Canopy" unique_id=776578203]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 3.4, -0.2)
+mesh = SubResource("SphereMesh_oomdq")
+surface_material_override/0 = SubResource("StandardMaterial3D_smknr")
+
+[node name="Collision" type="StaticBody3D" parent="." unique_id=279122981]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Collision" unique_id=715219583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("CylinderShape3D_ap0u0")

@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://b2clwwgegagqk"]
+
+[ext_resource type="Material" uid="uid://b71q6s2ddka33" path="res://Art/Environment/Walls/DungeonWall.tres" id="1_wtr8c"]
+[ext_resource type="Material" uid="uid://pnwygha23535" path="res://Art/Environment/Walls/WallTop_Cap.tres" id="2_k6o3k"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(2, 3, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(2, 3, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_prtu8"]
+size = Vector3(2, 0.25, 0.7)
+
+[node name="StoneWall" type="Node3D" unique_id=59011864]
+
+[node name="WallBody" type="StaticBody3D" parent="." unique_id=1514659053]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallBody" unique_id=1682698164]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+material_override = ExtResource("1_wtr8c")
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallBody" unique_id=654985362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_ap0u0")
+
+[node name="StoneCap" type="MeshInstance3D" parent="WallBody" unique_id=2074655896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, 0)
+material_override = ExtResource("2_k6o3k")
+mesh = SubResource("BoxMesh_prtu8")

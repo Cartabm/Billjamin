@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://dpwn522qbg5vc"]
+
+[ext_resource type="FontFile" uid="uid://bxcbvbq4uknb" path="res://Assets/Font/Friz Quadrata Bold.otf" id="1_hc7ly"]
+[ext_resource type="Script" uid="uid://cidklh1tw5v5q" path="res://Scripts/damage_number.gd" id="1_w08oa"]
+
+[node name="Label3D" type="Label3D" unique_id=1007353200]
+billboard = 1
+no_depth_test = true
+text = "1"
+font = ExtResource("1_hc7ly")
+font_size = 48
+script = ExtResource("1_w08oa")

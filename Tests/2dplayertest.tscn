@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://bs8phnn0aksbc"]
+
+[ext_resource type="Script" uid="uid://beta1agqrslpv" path="res://Scripts/player.gd" id="1_bltpd"]
+[ext_resource type="Texture2D" uid="uid://c037caa08obqd" path="res://Assets/Side/blasterI.png" id="2_tddl7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ap0u0"]
+shading_mode = 0
+albedo_color = Color(0.5597646, 0.9627343, 0.9302444, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ek0cf"]
+size = Vector2(2, 2)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ap0u0"]
+radius = 0.4
+height = 1.6
+
+[node name="Player" type="CharacterBody3D" unique_id=2007028265]
+transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 0, 0)
+script = ExtResource("1_bltpd")
+
+[node name="TestBillboard" type="Sprite3D" parent="." unique_id=248729734]
+transform = Transform3D(1, -8.326673e-17, 0, -1.1058862e-16, 1, 0, 0, 1.8488927e-32, 1, -8.326673e-17, 1, 1.8488927e-32)
+billboard = 1
+texture = ExtResource("2_tddl7")
+
+[node name="BillboardTestShape" type="MeshInstance3D" parent="TestBillboard" unique_id=350957947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_ap0u0")
+mesh = SubResource("QuadMesh_ek0cf")
+
+[node name="Blake_armature_Skeleton3D_hand_R#MuzzlePoint" type="Marker3D" parent="." unique_id=1720338872]
+visible = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1365250180]
+mesh = SubResource("CapsuleMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=806273573]
+transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_ap0u0")

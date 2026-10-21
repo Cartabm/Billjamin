@@ -2,8 +2,8 @@
 
 [ext_resource type="Material" uid="uid://c4sx457y7y66m" path="res://Assets/Textures/Terrain/AshenGround.tres" id="1_pjdqk"]
 [ext_resource type="PackedScene" uid="uid://driwv3hf2eyje" path="res://World/MiningSignpost.tscn" id="2_3e8g3"]
-[ext_resource type="PackedScene" uid="uid://5sgy0k2htp7b" path="res://player.tscn" id="2_j6dr8"]
-[ext_resource type="PackedScene" uid="uid://dyfv5ysxlde2i" path="res://TownCamera.tscn" id="3_3e8g3"]
+[ext_resource type="PackedScene" uid="uid://5sgy0k2htp7b" path="res://Scenes/player.tscn" id="2_j6dr8"]
+[ext_resource type="PackedScene" uid="uid://dyfv5ysxlde2i" path="res://Scenes/TownCamera.tscn" id="3_3e8g3"]
 [ext_resource type="PackedScene" uid="uid://bjots2u3kj5qw" path="res://World/Levels/ModularShed.tscn" id="3_87lox"]
 [ext_resource type="Texture2D" uid="uid://c8ol3qlq35arw" path="res://Assets/Textures/Terrain/Ground110_1K-JPG_Color.jpg" id="4_pti1t"]
 [ext_resource type="PackedScene" uid="uid://crbn6u7yg5lyx" path="res://World/MineEntrance.tscn" id="5_tw2tv"]

@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cbkqu3r4lyf1g"]
+
+[ext_resource type="Texture2D" uid="uid://bfhfituaul6j7" path="res://Art/Environment/Walls/CornerPillar_Cap.png" id="1_yj87e"]
+
+[resource]
+cull_mode = 2
+albedo_texture = ExtResource("1_yj87e")
+texture_filter = 0

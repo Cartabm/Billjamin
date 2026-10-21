@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://blovve2bfyhcb"]
+
+[ext_resource type="Material" uid="uid://b71q6s2ddka33" path="res://Art/Environment/Walls/DungeonWall.tres" id="1_dm8sm"]
+[ext_resource type="Material" uid="uid://b2r3vigbl6ubo" path="res://Art/Environment/Walls/WallTop_Cap_Side.tres" id="2_kr3oo"]
+[ext_resource type="Texture2D" uid="uid://bfhfituaul6j7" path="res://Art/Environment/Walls/CornerPillar_Cap.png" id="3_3kyro"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(0.75, 3.2, 0.75)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(0.75, 3.2, 0.75)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ap0u0"]
+size = Vector3(1.1, 0.2, 1.1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ek0cf"]
+size = Vector2(1.1, 1.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nfng7"]
+albedo_texture = ExtResource("3_3kyro")
+
+[node name="StoneCorner" type="Node3D" unique_id=708901519]
+
+[node name="CornerBody" type="StaticBody3D" parent="." unique_id=246537429]
+
+[node name="CornerMesh" type="MeshInstance3D" parent="CornerBody" unique_id=1204545120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+material_override = ExtResource("1_dm8sm")
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CornerBody" unique_id=1370275439]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+shape = SubResource("BoxShape3D_ap0u0")
+
+[node name="CornerCap" type="MeshInstance3D" parent="CornerBody" unique_id=997913198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+material_override = ExtResource("2_kr3oo")
+mesh = SubResource("BoxMesh_ap0u0")
+
+[node name="CapArtwork" type="MeshInstance3D" parent="CornerBody/CornerCap" unique_id=1521612624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, -0.11)
+mesh = SubResource("PlaneMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_nfng7")

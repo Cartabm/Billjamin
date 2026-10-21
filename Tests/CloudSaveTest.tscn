@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dgjujqyvu5s6r"]
+
+[ext_resource type="Script" uid="uid://cio2h3wepycmh" path="res://Tests/CloudSaveTest.gd" id="1_kdoq2"]
+
+[node name="CloudSaveTest" type="Node" unique_id=1621060777]
+script = ExtResource("1_kdoq2")

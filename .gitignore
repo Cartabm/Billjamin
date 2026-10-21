@@ -1,3 +1,16 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Old Godot cache
+.godot_old/
+
+# Temporary and backup files
+*.tmp
+*.bak
+
+# Exported game builds
+/builds/
+/dist/
+/Assets/Font/Friz Quadrata Bold.otf
+/Assets/Font/Friz Quadrata Bold.otf.import

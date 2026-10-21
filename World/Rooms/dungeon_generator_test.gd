@@ -51,7 +51,7 @@ var boss_instance: Node3D
 var dungeon_floor: int = 1
 var dungeon_portal: Node3D
 var floor_label: Label
-const PORTAL_SCRIPT = preload("res://DungeonPortal.gd")
+const PORTAL_SCRIPT = preload("res://Scripts/DungeonPortal.gd")
 
 func _ready() -> void:
 	rng.randomize()
@@ -538,19 +538,37 @@ func _spawn_boss() -> void:
 		return
 	boss_spawned = true
 	boss_instance = boss
-	# Use the same per-room multipliers as ordinary encounters.
-	# Room 12 => 4.85x health and 1.55x damage with current settings.
-	var difficulty := (dungeon_floor - 1) * (room_count - 1) + room_count
-	var extra_rooms := maxi(0, difficulty - 1)
+
+	# Match the room-based scaling used by normal encounters.
+	var difficulty: int = (dungeon_floor - 1) * (room_count - 1) + room_count
+	var extra_rooms: int = maxi(0, difficulty - 1)
 	var template_encounter = room_encounters[boss_room_cell]
 	var health_multiplier: float = 1.0 + float(extra_rooms) * template_encounter.health_increase_per_room
 	var damage_multiplier: float = 1.0 + float(extra_rooms) * template_encounter.damage_increase_per_room
-	for property in boss.get_property_list():
-		var property_name: String = property["name"]
-		if property_name == "max_health":
-			boss.set(property_name, maxi(1, roundi(float(boss.get(property_name)) * health_multiplier * 0.9)))
-		elif property_name in ["contact_damage", "punch_damage", "attack_damage", "charge_damage", "lunge_damage", "brute_damage"]:
-			boss.set(property_name, maxi(1, roundi(float(boss.get(property_name)) * damage_multiplier)))
+
+	# Boss.gd uses boss_max_health, not max_health.
+	if _boss_has_property(boss, "boss_max_health"):
+		var base_health: int = int(boss.get("boss_max_health"))
+		var scaled_health: int = maxi(1, roundi(float(base_health) * health_multiplier))
+		var minimum_health: int = 1800 + maxi(0, dungeon_floor - 1) * 600
+		boss.set("boss_max_health", maxi(scaled_health, minimum_health))
+	else:
+		push_warning("Boss is missing boss_max_health; health scaling was not applied.")
+
+	# Scale the attack variables actually declared by Boss.gd.
+	var boss_damage_properties: Array[String] = [
+		"contact_damage",
+		"charge_damage",
+		"slam_damage",
+		"combo_damage"
+	]
+	for property_name in boss_damage_properties:
+		if _boss_has_property(boss, property_name):
+			boss.set(
+				property_name,
+				maxi(1, roundi(float(boss.get(property_name)) * damage_multiplier))
+			)
+
 	if not boss.has_method("take_damage"):
 		push_error("Boss.gd does not implement take_damage(amount). Player shots may not damage it.")
 	if boss is CollisionObject3D:
@@ -558,11 +576,16 @@ func _spawn_boss() -> void:
 	boss.tree_exiting.connect(_on_boss_exiting.bind(boss))
 	get_tree().current_scene.add_child(boss)
 	boss.global_position = Vector3(boss_room_cell.x * get_grid_spacing(), boss_spawn_height, boss_room_cell.y * get_grid_spacing())
-	# Boss scripts often initialize current_health from max_health in _ready().
-	# Set it again here to ensure the scaled maximum is fully available.
-	if _boss_has_property(boss, "current_health") and _boss_has_property(boss, "max_health"):
-		boss.set("current_health", boss.get("max_health"))
-	print("BOSS SPAWNED: floor ", dungeon_floor, " HP after 80% nerf: ", boss.get("max_health") if _boss_has_property(boss, "max_health") else "unknown", " damage x", damage_multiplier)
+
+	# Boss._ready() initializes health from boss_max_health; synchronize it here too.
+	if _boss_has_property(boss, "health") and _boss_has_property(boss, "boss_max_health"):
+		boss.set("health", boss.get("boss_max_health"))
+
+	print(
+		"BOSS SPAWNED | Floor: ", dungeon_floor,
+		" | HP: ", boss.get("boss_max_health") if _boss_has_property(boss, "boss_max_health") else "unknown",
+		" | Damage multiplier: ", damage_multiplier
+	)
 
 
 func _boss_has_property(object: Object, property_name: String) -> bool:

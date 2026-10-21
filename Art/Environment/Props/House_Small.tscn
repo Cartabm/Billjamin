@@ -1,0 +1,153 @@
+[gd_scene format=3 uid="uid://du8c5vqon4aqx"]
+
+[ext_resource type="Script" uid="uid://bqs38pnwougvi" path="res://Art/Environment/Props/house_small.gd" id="1_v4rpv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_i2hc2"]
+size = Vector3(6, 0.4, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v4rpv"]
+albedo_color = Color(0.30323282, 0.30323282, 0.30323282, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_whixk"]
+size = Vector3(6, 2.8, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ph0kn"]
+size = Vector3(0.3, 2.8, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_psy53"]
+size = Vector3(0.3, 2.8, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ktp3b"]
+size = Vector3(2.1, 2.8, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hi77c"]
+size = Vector3(2.1, 2.8, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ek0cf"]
+size = Vector3(3.8, 0.25, 5.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ap0u0"]
+size = Vector3(3.8, 0.25, 5.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2ipq2"]
+size = Vector3(1.7, 2.5, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hieja"]
+size = Vector3(2.1, 2.8, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n7y2e"]
+size = Vector3(2.1, 2.8, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oomdq"]
+size = Vector3(0.3, 2.8, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jni1y"]
+size = Vector3(0.3, 2.8, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_prtu8"]
+size = Vector3(6, 2.8, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ap0u0"]
+size = Vector3(6, 0.4, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_umb2s"]
+size = Vector3(2.5, 2.5, 2)
+
+[sub_resource type="Gradient" id="Gradient_v4rpv"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ek0cf"]
+gradient = SubResource("Gradient_v4rpv")
+
+[node name="House_Small" type="Node3D" unique_id=1988461747]
+script = ExtResource("1_v4rpv")
+
+[node name="Foundation" type="MeshInstance3D" parent="." unique_id=1533051908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("BoxMesh_i2hc2")
+surface_material_override/0 = SubResource("StandardMaterial3D_v4rpv")
+
+[node name="Walls" type="Node3D" parent="." unique_id=279976888]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls" unique_id=1677983244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -2.35)
+mesh = SubResource("BoxMesh_whixk")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Walls" unique_id=1262516058]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.85, 1.8, 0)
+mesh = SubResource("BoxMesh_ph0kn")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Walls" unique_id=1774125398]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.85, 1.8, 0)
+mesh = SubResource("BoxMesh_psy53")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Walls" unique_id=785018123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.95, 1.8, 2.35)
+mesh = SubResource("BoxMesh_ktp3b")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="Walls" unique_id=1199456890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95, 1.8, 2.35)
+mesh = SubResource("BoxMesh_hi77c")
+
+[node name="Roof" type="Node3D" parent="." unique_id=620288233]
+
+[node name="Roof_Left" type="MeshInstance3D" parent="Roof" unique_id=200981942]
+transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, -1.55, 4, 0)
+mesh = SubResource("BoxMesh_ek0cf")
+
+[node name="Roof_Right" type="MeshInstance3D" parent="Roof" unique_id=702676773]
+transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 1.55, 4, 0)
+mesh = SubResource("BoxMesh_ap0u0")
+
+[node name="Door" type="MeshInstance3D" parent="." unique_id=882930201]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 2.55)
+mesh = SubResource("BoxMesh_2ipq2")
+
+[node name="Collision" type="StaticBody3D" parent="." unique_id=1747485551]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Collision" unique_id=1556616431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95, 1.8, 2.35)
+shape = SubResource("BoxShape3D_hieja")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Collision" unique_id=1484613823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.95, 1.8, 2.35)
+shape = SubResource("BoxShape3D_n7y2e")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Collision" unique_id=42107431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.85, 1.8, 0)
+shape = SubResource("BoxShape3D_oomdq")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Collision" unique_id=1754451676]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.85, 1.8, 0)
+shape = SubResource("BoxShape3D_jni1y")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Collision" unique_id=126215111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -2.35)
+shape = SubResource("BoxShape3D_prtu8")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="Collision" unique_id=1121359478]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("BoxShape3D_ap0u0")
+
+[node name="DungeonEntrance" type="Marker3D" parent="." unique_id=383598483]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3.3)
+
+[node name="DoorInteraction" type="Area3D" parent="." unique_id=936783391]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorInteraction" unique_id=2089409725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3.2)
+shape = SubResource("BoxShape3D_umb2s")
+
+[node name="PromptBackground" type="Sprite3D" parent="." unique_id=892453440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 3.05)
+billboard = 1
+no_depth_test = true
+texture = SubResource("GradientTexture2D_ek0cf")
+
+[node name="InteractionPrompt" type="Label3D" parent="." unique_id=1567684489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 4)
+billboard = 1
+no_depth_test = true
+modulate = Color(0.015686275, 0.6117647, 0.6117647, 1)
+outline_modulate = Color(0.46229059, 0.46229059, 0.46229059, 1)
+text = "E"
+font_size = 50

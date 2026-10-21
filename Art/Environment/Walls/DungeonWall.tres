@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b71q6s2ddka33"]
+
+[ext_resource type="Texture2D" uid="uid://da668k57cv5d3" path="res://Art/Environment/Walls/DungeonWall.png" id="1_virpv"]
+
+[resource]
+albedo_texture = ExtResource("1_virpv")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 0

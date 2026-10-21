@@ -1,0 +1,4 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://j88shi324uja"]
+
+[resource]
+uv1_triplanar = true

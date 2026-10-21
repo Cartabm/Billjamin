@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://dd0wwfbfknmfa"]
+
+[ext_resource type="Script" uid="uid://0ccx8weun7xr" path="res://Scripts/projectile.gd" id="1_a85iw"]
+[ext_resource type="Texture2D" uid="uid://d2oacymbdyww" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Arrow(projectile)/Arrow01(32x32).png" id="2_sxmqc"]
+[ext_resource type="Texture2D" uid="uid://ccest01xml8b0" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Arrow(projectile)/Arrow01(100x100).png" id="3_2xblw"]
+[ext_resource type="Script" uid="uid://cpcec2cuoq6ud" path="res://Scripts/fireball_sprite.gd" id="30_2026s"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_ek0cf"]
+radius = 0.2
+height = 0.4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ap0u0"]
+radius = 0.2
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dac07"]
+atlas = ExtResource("2_sxmqc")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0c7x6"]
+atlas = ExtResource("3_2xblw")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ek0cf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dac07")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0c7x6")
+}],
+"loop": 1,
+"name": &"new_animation",
+"speed": 5.0
+}]
+
+[node name="Projectile" type="Area3D" unique_id=1555198491]
+script = ExtResource("1_a85iw")
+hit_radius = 0.35
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1365460715]
+visible = false
+mesh = SubResource("SphereMesh_ek0cf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2119880551]
+shape = SubResource("SphereShape3D_ap0u0")
+
+[node name="FireballSprite" type="AnimatedSprite3D" parent="." unique_id=434769216]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
+billboard = 1
+sprite_frames = SubResource("SpriteFrames_ek0cf")
+script = ExtResource("30_2026s")
