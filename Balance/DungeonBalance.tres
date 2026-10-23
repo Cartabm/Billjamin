@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EnemyBalanceProfile" format=3 uid="uid://ck218i2f01khm"]
+
+[ext_resource type="Script" uid="uid://drngm7g4pvvgh" path="res://Scripts/EnemyBalanceProfile.gd" id="1_ytyto"]
+
+[resource]
+script = ExtResource("1_ytyto")
+elite_chance = 0.05
+metadata/_custom_type_script = "uid://drngm7g4pvvgh"

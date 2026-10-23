@@ -68,19 +68,36 @@ func _fire_projectile() -> void:
 		return
 
 	var projectile := projectile_scene.instantiate() as Node3D
+
 	if projectile == null:
 		push_error("Ranged enemy projectile scene must have a Node3D root.")
 		return
 
-	var origin: Vector3 = global_position + Vector3.UP * projectile_spawn_height
+	# Spawn projectile at player collision height.
+	var origin: Vector3 = global_position + Vector3.UP * 0.7
 	var target: Vector3 = player.global_position + Vector3.UP * 0.7
-	var direction: Vector3 = (target - origin).normalized()
-	var final_damage: int = _apply_elite_contact_damage(ranged_attack_damage)
 
-	# Configure before entering the tree so the projectile is ready immediately.
+	# Aim horizontally at player's current position.
+	var direction: Vector3 = target - origin
+	direction.y = 0.0
+
+	if direction.length_squared() < 0.001:
+		projectile.queue_free()
+		return
+
+	direction = direction.normalized()
+
+	var final_damage: int = _apply_elite_contact_damage(
+		ranged_attack_damage
+	)
+
 	projectile.set("direction", direction)
 	projectile.set("speed", projectile_speed)
 	projectile.set("damage", final_damage)
 	projectile.set("target_player", player)
+
+	# Use this enemy's configured range as projectile travel limit.
+	projectile.set("max_travel_distance", attack_range)
+
 	get_tree().current_scene.add_child(projectile)
 	projectile.global_position = origin

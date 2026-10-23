@@ -8,6 +8,9 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ek0cf"]
 height = 1.5
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ap0u0"]
+height = 1.5
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_epg4t"]
 atlas = ExtResource("4_iifgy")
 region = Rect2(128, 16, 16, 16)
@@ -204,6 +207,12 @@ contact_damage_cooldown = 1.0
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=601162159]
 shape = SubResource("CapsuleShape3D_ek0cf")
 
+[node name="ContactDamageArea" type="Area3D" parent="." unique_id=1433932033]
+collision_layer = 0
+
+[node name="ContactShape" type="CollisionShape3D" parent="ContactDamageArea" unique_id=543971622]
+shape = SubResource("CapsuleShape3D_ap0u0")
+
 [node name="EnemySprite" type="AnimatedSprite3D" parent="." unique_id=1036339423]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
 billboard = 1
@@ -227,10 +236,10 @@ mesh = SubResource("BoxMesh_jni1y")
 transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
 visible = false
 
-[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=1583117048]
+[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=78201142]
 visible = false
 
-[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1267743977]
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=873260450]
 bones/1/position = Vector3(0.3519203, 0.0727973, -0.457257)
 bones/1/rotation = Quaternion(6.1599435e-06, 0.68542606, 0.7281423, 1.4452308e-05)
 bones/2/position = Vector3(0.0034563416, 0.8202857, 0.24707782)
@@ -263,13 +272,13 @@ bones/39/rotation = Quaternion(0.31928724, -0.0043265997, -0.009673393, 0.947598
 bones/41/position = Vector3(-0.34929794, 0.11403547, 0.6262628)
 bones/41/rotation = Quaternion(-1.1940042e-05, 0.8794672, 0.47595972, -1.0840305e-05)
 
-[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=107495399]
+[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=1018052130]
 autoplay = &"Walk"
 
 [node name="Ninja2" parent="MonsterVisual" unique_id=2041443202 instance=ExtResource("3_qi2p4")]
 visible = false
 
-[node name="Skeleton3D" parent="MonsterVisual/Ninja2/CharacterArmature" parent_id_path=PackedInt32Array(2041443202, 299997972) index="0" unique_id=1383976121]
+[node name="Skeleton3D" parent="MonsterVisual/Ninja2/CharacterArmature" parent_id_path=PackedInt32Array(2041443202, 1440305019) index="0" unique_id=1222477824]
 bones/2/rotation = Quaternion(-3.5526934e-15, 1.1920933e-07, -8.470341e-22, 1)
 bones/4/rotation = Quaternion(0.16683148, 4.3189968e-07, 1.0312019e-07, 0.9859854)
 bones/5/rotation = Quaternion(0.09618958, -8.2847305e-07, 2.1512411e-08, 0.99536306)

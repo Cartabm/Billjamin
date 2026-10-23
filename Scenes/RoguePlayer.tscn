@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://8b10ukxqb5x2"]
 
-[ext_resource type="Script" uid="uid://dne0cpkv148ms" path="res://Art/Environment/rogue_shared_systems.gd" id="1_4et8p"]
+[ext_resource type="Script" path="res://Scripts/character_controller.gd" id="1_4et8p"]
 [ext_resource type="PackedScene" uid="uid://brbdnyiopa66g" path="res://Art/Characters/Rogue.gltf" id="2_os3an"]
 [ext_resource type="Material" uid="uid://wysm7ic4osew" path="res://Art/Characters/Materials/Rogue_Texture.tres" id="3_eqbw2"]
-[ext_resource type="PackedScene" uid="uid://b11njyi1ro1ek" path="res://Art/Environment/MeleeTelegraph.tscn" id="4_b1a44"]
 
+[ext_resource type="Resource" path="res://Balance/RogueBalance.tres" id="character_balance"]
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
 radius = 0.35
 height = 1.6
@@ -45,10 +45,13 @@ bottom_radius = 0.45
 height = 0.1
 radial_segments = 32
 
-[node name="TestPlayer" type="CharacterBody3D" unique_id=1933289208]
+[node name="TestPlayer" type="CharacterBody3D" node_paths=PackedStringArray("visual_root", "animation_player", "character_sprite") unique_id=1933289208]
 collision_mask = 5
 script = ExtResource("1_4et8p")
-auto_attack_range = 5.0
+balance_profile = ExtResource("character_balance")
+visual_root = NodePath("CharacterModel")
+animation_player = NodePath("CharacterModel/AnimationPlayer")
+character_sprite = NodePath("CharacterVisual")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1843834578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
@@ -69,7 +72,7 @@ texture_filter = 0
 [node name="CharacterModel" parent="." unique_id=656864883 instance=ExtResource("2_os3an")]
 transform = Transform3D(0.528, 0, 0, 0, 0.528, 0, 0, 0, 0.528, 0, 0, 0)
 
-[node name="Skeleton3D" parent="CharacterModel/CharacterArmature" parent_id_path=PackedInt32Array(656864883, 984399885) index="0" unique_id=1032989003]
+[node name="Skeleton3D" parent="CharacterModel/CharacterArmature" parent_id_path=PackedInt32Array(656864883, 413046119) index="0" unique_id=291893976]
 bones/1/position = Vector3(0.05716157, 0.024662921, -0.3462345)
 bones/1/rotation = Quaternion(0.46121296, 0.53512555, 0.5414252, -0.45583114)
 bones/2/position = Vector3(0.0021529722, 1.0306467, 0.18307199)
@@ -111,35 +114,32 @@ bones/30/rotation = Quaternion(0.26499224, 0.65233546, 0.6600286, -0.26191595)
 bones/31/position = Vector3(0.064815134, 0.3428022, 0.59965044)
 bones/31/rotation = Quaternion(-3.552734e-15, -5.9604645e-07, 3.3881257e-21, 1)
 
-[node name="Foot_L" parent="CharacterModel/CharacterArmature/Skeleton3D" index="0" unique_id=2048585894]
+[node name="Foot_L" parent="CharacterModel/CharacterArmature/Skeleton3D" index="0" unique_id=334642101]
 transform = Transform3D(-0.15900064, 0.9872109, 0.011570875, 1.6777947e-05, -0.011717194, 0.9999314, 0.9872783, 0.15899001, 0.001846487, 0.055849936, 0.022247527, -0.34634918)
 
-[node name="Head" parent="CharacterModel/CharacterArmature/Skeleton3D" index="1" unique_id=1660787148]
+[node name="Head" parent="CharacterModel/CharacterArmature/Skeleton3D" index="1" unique_id=1564327560]
 transform = Transform3D(0.998302, -0.05676935, 0.013051659, 0.058203764, 0.9811016, -0.18453193, -0.002329111, 0.18497829, 0.98273987, -0.061550133, 2.0149138, 0.18487146)
 
-[node name="LowerArm_L" parent="CharacterModel/CharacterArmature/Skeleton3D" index="2" unique_id=1013976284]
+[node name="LowerArm_L" parent="CharacterModel/CharacterArmature/Skeleton3D" index="2" unique_id=1701103865]
 transform = Transform3D(0.55588126, 0.26517582, 0.7878311, 0.22585782, -0.9602802, 0.16385898, 0.7999903, 0.086851716, -0.5936939, 0.31057292, 1.4331876, -0.18712121)
 
-[node name="Weapon_R" parent="CharacterModel/CharacterArmature/Skeleton3D" index="3" unique_id=250501474]
+[node name="Weapon_R" parent="CharacterModel/CharacterArmature/Skeleton3D" index="3" unique_id=462649173]
 transform = Transform3D(-0.6772797, 0.60724944, -0.4153796, -0.6266836, -0.18038285, 0.7581092, 0.38543385, 0.7737633, 0.5027231, -0.20315889, 1.4634674, 1.0751624)
 
-[node name="Abdomen" parent="CharacterModel/CharacterArmature/Skeleton3D" index="4" unique_id=200503781]
+[node name="Abdomen" parent="CharacterModel/CharacterArmature/Skeleton3D" index="4" unique_id=871505687]
 transform = Transform3D(0.8506215, 0.12362322, 0.51103866, 2.1979213e-07, 0.9719653, -0.23512441, -0.52577853, 0.20000203, 0.82677454, -0.11716807, 1.1311243, 0.06606381)
 
-[node name="Foot_R" parent="CharacterModel/CharacterArmature/Skeleton3D" index="5" unique_id=1116501119]
+[node name="Foot_R" parent="CharacterModel/CharacterArmature/Skeleton3D" index="5" unique_id=2046975380]
 transform = Transform3D(-0.7223581, 0.6914722, 0.0080908, -1.6320255e-05, -0.011717041, 0.9999316, 0.69151926, 0.72230846, 0.008475122, -0.27907145, 0.02224748, 0.32660782)
 
-[node name="Rogue" parent="CharacterModel/CharacterArmature/Skeleton3D" index="6" unique_id=1013935423]
+[node name="Rogue" parent="CharacterModel/CharacterArmature/Skeleton3D" index="6" unique_id=90753551]
 mesh = SubResource("ArrayMesh_uvecc")
 
 [node name="GroundShadow" type="MeshInstance3D" parent="." unique_id=1621562239]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.015, 0)
+visible = false
 material_override = SubResource("StandardMaterial3D_ap0u0")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_m4any")
-
-[node name="MeleeTelegraph" parent="." unique_id=1614960480 instance=ExtResource("4_b1a44")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
-visible = false
 
 [editable path="CharacterModel"]

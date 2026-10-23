@@ -1,10 +1,12 @@
 [gd_scene format=3 uid="uid://brpknyhqa0fq8"]
 
+[ext_resource type="Script" uid="uid://tq3en5aiuaie" path="res://Scenes/arena.gd" id="1_lgt66"]
 [ext_resource type="Material" uid="uid://t6axnrxoifgp" path="res://Resources/greyfloor.tres" id="1_ubfh8"]
 [ext_resource type="Material" uid="uid://bprvixnajv67v" path="res://Resources/PillarGrey.tres" id="2_27ga2"]
 [ext_resource type="Material" uid="uid://dfsc7vdm0xpin" path="res://Resources/GateBrown.tres" id="3_h0wof"]
+[ext_resource type="Script" uid="uid://bdx1j3rp11ko5" path="res://Scripts/enemy_spawner_arena_balance.gd" id="3_lkdvd"]
 [ext_resource type="PackedScene" uid="uid://5sgy0k2htp7b" path="res://Scenes/player.tscn" id="4_h0wof"]
-[ext_resource type="Script" uid="uid://c2dglxho0qchj" path="res://Scripts/enemy_spawner.gd" id="5_n068f"]
+[ext_resource type="Resource" uid="uid://2g8xa1qahweq" path="res://Balance/ArenaBalance.tres" id="4_lkdvd"]
 [ext_resource type="PackedScene" uid="uid://x2aibfdis1lc" path="res://Scenes/enemy.tscn" id="6_g8a64"]
 [ext_resource type="PackedScene" uid="uid://bg6eaj5wkjbx0" path="res://Scenes/enemy_charger.tscn" id="7_uvldv"]
 [ext_resource type="PackedScene" uid="uid://dj86n2ifo4rmb" path="res://Scenes/enemy_stalker.tscn" id="8_nb1nt"]
@@ -41,12 +43,14 @@ background_mode = 1
 background_color = Color(0.14509805, 0.16078432, 0.19607843, 1)
 
 [node name="Arena" type="Node3D" unique_id=1271227402]
+script = ExtResource("1_lgt66")
 
 [node name="HordeManager" type="Node" parent="." unique_id=1427789711]
 script = ExtResource("11_horde")
 
 [node name="EnemySpawner" type="Node3D" parent="." unique_id=1587564442]
-script = ExtResource("5_n068f")
+script = ExtResource("3_lkdvd")
+balance_profile = ExtResource("4_lkdvd")
 enemy_scene = ExtResource("6_g8a64")
 charger_scene = ExtResource("7_uvldv")
 stalker_scene = ExtResource("8_nb1nt")

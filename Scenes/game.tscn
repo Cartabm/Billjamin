@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dyfv5ysxlde2i" path="res://Scenes/TownCamera.tscn" id="3_j5wjh"]
 [ext_resource type="PackedScene" uid="uid://05cnluvyrarn" path="res://Scenes/Boss.tscn" id="5_vef74"]
 [ext_resource type="PackedScene" uid="uid://bg6eaj5wkjbx0" path="res://Scenes/enemy_charger.tscn" id="6_iotsf"]
+[ext_resource type="Resource" uid="uid://c3pt4ucscnei7" path="res://Balance/GameBalance.tres" id="7_ewbju"]
 [ext_resource type="PackedScene" uid="uid://dj86n2ifo4rmb" path="res://Scenes/enemy_stalker.tscn" id="7_lc2xo"]
 [ext_resource type="PackedScene" uid="uid://m8j8e8kv0mgl" path="res://Scenes/enemy_brute.tscn" id="8_215e1"]
 [ext_resource type="PackedScene" uid="uid://bpmg3b5xyly5i" path="res://Scenes/ArenaDecorations.tscn" id="13_lc2xo"]
@@ -14,8 +15,6 @@
 [ext_resource type="FontFile" uid="uid://bgal68bxxyo8b" path="res://Assets/Font/IMFellEnglishSC-Regular.ttf" id="19_boyg6"]
 [ext_resource type="AudioStream" uid="uid://d2daca5obvsk6" path="res://Assets/Audio/Dungeon_Ambience_Loop.wav" id="19_e36ub"]
 [ext_resource type="AudioStream" uid="uid://c15hudojlw7s8" path="res://Assets/Audio/Combat_Loop.wav" id="20_x5p1p"]
-[ext_resource type="AudioStream" uid="uid://c68k8ukl1wnbg" path="res://Assets/Audio/UI_Click.wav" id="21_qhcbd"]
-[ext_resource type="Script" uid="uid://gvgpmeae7i12" path="res://Scripts/UIClickSound.gd" id="22_f1jbl"]
 [ext_resource type="PackedScene" uid="uid://c5u6x54kpwma5" path="res://Scenes/GameHUD.tscn" id="billjamin_shared_hud"]
 [ext_resource type="Script" uid="uid://dl5ylij122o4a" path="res://Scripts/horde_manager.gd" id="horde_manager_phase1"]
 
@@ -114,6 +113,7 @@ fov = 70.0
 [node name="EnemySpawner" type="Node3D" parent="." unique_id=1936725154]
 transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 0, 0)
 script = ExtResource("3_feb5d")
+balance_profile = ExtResource("7_ewbju")
 enemy_scene = ExtResource("1_e2o6t")
 charger_scene = ExtResource("6_iotsf")
 stalker_scene = ExtResource("7_lc2xo")
@@ -157,10 +157,5 @@ autoplay = true
 
 [node name="CombatMusic" type="AudioStreamPlayer3D" parent="." unique_id=267367647]
 stream = ExtResource("20_x5p1p")
-
-[node name="UIClickSound" type="AudioStreamPlayer" parent="." unique_id=1357663558]
-stream = ExtResource("21_qhcbd")
-volume_db = -8.0
-script = ExtResource("22_f1jbl")
 
 [editable path="ArenaDecorations"]

@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://b4lypicm1esv"]
+
+[ext_resource type="Script" uid="uid://cbt3opvkqetcn" path="res://Systems/Inventory/ground_item.gd" id="1_a8oso"]
+[ext_resource type="Texture2D" uid="uid://cpc6avpbpov2x" path="res://Assets/Items/Icons/iron_chestplate.jpg" id="1_jaemy"]
+[ext_resource type="Script" uid="uid://ddggp08xqcbxn" path="res://Systems/Inventory/loot_label_viewport.gd" id="3_lfib4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ek0cf"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.1254902, 0.1254902, 0.1254902, 1)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_lfib4"]
+viewport_path = NodePath("LootLabelViewport")
+
+[node name="GroundItem" type="Node3D" unique_id=511042199]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+script = ExtResource("1_a8oso")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1776786693]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+texture = ExtResource("1_jaemy")
+
+[node name="LootLabelViewport" type="SubViewport" parent="." unique_id=1620786602]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(400, 60)
+render_target_update_mode = 4
+script = ExtResource("3_lfib4")
+
+[node name="LootLabelPanel" type="PanelContainer" parent="LootLabelViewport" unique_id=76180690]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ek0cf")
+
+[node name="LootLabelText" type="Label" parent="LootLabelViewport/LootLabelPanel" unique_id=1591754639]
+layout_mode = 2
+text = "Iron Chestplate"
+
+[node name="LootLabelDisplay" type="Sprite3D" parent="." unique_id=1088001807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+pixel_size = 0.005
+billboard = 1
+texture = SubResource("ViewportTexture_lfib4")

@@ -318,7 +318,7 @@ animations = [{
 
 [node name="Enemy" type="CharacterBody3D" unique_id=394797931]
 collision_layer = 2
-collision_mask = 0
+collision_mask = 4
 script = ExtResource("1_ik4ec")
 enemy_behavior = 3
 contact_damage = 10
@@ -336,18 +336,18 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ap0u0")
 transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
 visible = false
 
-[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=1583117048]
+[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=165251839]
 visible = false
 
-[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1267743977]
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1115411950]
 bones/7/rotation = Quaternion(-0.39071882, -0.00025390706, 0.000107201646, 0.9205102)
 
-[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=107495399]
+[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=997331775]
 autoplay = &"Walk"
 
 [node name="MushroomKing2" parent="MonsterVisual" unique_id=76165281 instance=ExtResource("3_22bsb")]
 
-[node name="Skeleton3D" parent="MonsterVisual/MushroomKing2/CharacterArmature" parent_id_path=PackedInt32Array(76165281, 858503203) index="0" unique_id=682069527]
+[node name="Skeleton3D" parent="MonsterVisual/MushroomKing2/CharacterArmature" parent_id_path=PackedInt32Array(76165281, 1964174986) index="0" unique_id=1109459146]
 bones/2/rotation = Quaternion(-3.5526934e-15, 1.1920933e-07, -8.470341e-22, 1)
 bones/4/rotation = Quaternion(0.16683151, 4.3189968e-07, 1.031202e-07, 0.9859854)
 bones/5/rotation = Quaternion(0.09618958, -8.2847305e-07, 2.1512408e-08, 0.99536306)

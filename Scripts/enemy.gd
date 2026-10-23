@@ -18,6 +18,7 @@ enum EnemyAIBehavior {
 @export var arena_half_size: float = 9.0
 @export var contact_damage: int = 50
 @export var contact_damage_cooldown: float = 0.5
+@export_range(0.0, 0.2, 0.005) var contact_hitbox_padding: float = 0.06
 @export var magnet_drop_chance: float = 0.01
 
 @export_group("Run Currency Drops")
@@ -100,6 +101,7 @@ const PLAYER_POSITION_REFRESH_INTERVAL: float = 0.1
 
 
 var contact_damage_timer: float = 0.0
+var contact_damage_area: Area3D = null
 var health: int
 var base_health: int
 var player: CharacterBody3D
@@ -194,28 +196,38 @@ func find_animation_player() -> AnimationPlayer:
 
 func _ready() -> void:
 	add_to_group("enemies")
-	# Horde manager owns the physics tick; the body remains queryable by projectiles.
-	set_physics_process(false)
+	# Enemies are on layer 2 and collide with the floor on layer 1.
+# Enemies belong to physics layer 2.
 	collision_layer = 2
-	collision_mask = 4
+
+# Collide with layers 1, 2, and 3.
+# Layer 3 contains the procedural Overworld terrain.
+	collision_mask = 7
+
 	var scene_root := get_tree().current_scene
-
-	print("enemy bug scene ", scene_root.name if scene_root != null else "null")
-
 	var manager: Node = null
 
 	if scene_root != null:
-		manager = scene_root.get_node_or_null("HordeManager")
+		manager = scene_root.find_child("HordeManager", true, false)
 
-		print("enemy bug = hordemanager found: ", manager != null)
-
-		if manager != null:
-			manager.register_enemy(self)
+	if manager != null and manager.has_method("register_enemy"):
+		manager.register_enemy(self)
+		set_physics_process(false)
+		print("Enemy registered with HordeManager: ", name)
+	else:
+		# No HordeManager in this scene.
+		# Use the enemy's own physics processing instead.
+		set_physics_process(true)
+		print("Enemy using standalone physics: ", name)
 
 	# Remove the health bar entirely.
 	var health_bar := get_node_or_null("HealthBar")
 	if health_bar != null:
 		health_bar.queue_free()
+
+	# Match the contact detector to the existing physics body once at spawn.
+	# This does not change movement or floor collisions.
+	_setup_contact_damage_area()
 
 	base_health = max_health
 	find_player()
@@ -237,6 +249,73 @@ func _ready() -> void:
 
 	# Only elite enemies need per-frame visual processing.
 	set_process(is_elite)
+
+# Contact hitbox: a small padded copy of the enemy's movement collider.
+# It is deliberately separate from the body's physical collision shape.
+func _setup_contact_damage_area() -> void:
+	var body_shape := get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if body_shape == null:
+		push_warning("Missing body CollisionShape3D on " + name)
+		return
+
+	# Automatically add the component for future enemies that use this script.
+	contact_damage_area = get_node_or_null("ContactDamageArea") as Area3D
+	if contact_damage_area == null:
+		contact_damage_area = Area3D.new()
+		contact_damage_area.name = "ContactDamageArea"
+		add_child(contact_damage_area)
+
+	var contact_shape := contact_damage_area.get_node_or_null("ContactShape") as CollisionShape3D
+	if contact_shape == null:
+		contact_shape = CollisionShape3D.new()
+		contact_shape.name = "ContactShape"
+		contact_damage_area.add_child(contact_shape)
+
+	if body_shape.shape == null:
+		push_warning("Enemy body has no collision shape: " + name)
+		return
+
+	contact_damage_area.collision_layer = 0
+	contact_damage_area.collision_mask = 1 # Player body uses physics layer 1.
+	contact_damage_area.monitoring = true
+	contact_damage_area.monitorable = true
+
+	# Duplicate the resource so adjusting contact size cannot change movement.
+	var new_shape := body_shape.shape.duplicate(true) as Shape3D
+	var pad := maxf(contact_hitbox_padding, 0.0)
+
+	if new_shape is CapsuleShape3D:
+		var capsule := new_shape as CapsuleShape3D
+		capsule.radius += pad
+		capsule.height = maxf(capsule.height + pad * 2.0, capsule.radius * 2.0)
+	elif new_shape is CylinderShape3D:
+		var cylinder := new_shape as CylinderShape3D
+		cylinder.radius += pad
+		cylinder.height += pad * 2.0
+	elif new_shape is BoxShape3D:
+		var box_shape := new_shape as BoxShape3D
+		box_shape.size += Vector3.ONE * (pad * 2.0)
+
+	contact_shape.shape = new_shape
+	# Both shapes are children of the same enemy root through an untransformed Area3D.
+	contact_damage_area.transform = Transform3D.IDENTITY
+	contact_shape.transform = body_shape.transform
+	contact_shape.disabled = false
+
+
+# Godot maintains this overlap list in the physics engine.
+# A tiny padding makes contact register when solid bodies touch, since
+# CharacterBody3D colliders normally prevent deep penetration.
+func _player_is_in_contact() -> bool:
+	if contact_damage_area == null or not is_instance_valid(player):
+		return false
+
+	for body in contact_damage_area.get_overlapping_bodies():
+		if body == player and body.is_in_group("player"):
+			return true
+
+	return false
+
 
 func _freeze_enemy_visuals() -> void:
 	# Freeze AnimatedSprite3D on a single frame.
@@ -290,7 +369,8 @@ func find_player() -> void:
 
 
 
-
+func _physics_process(delta: float) -> void:
+	_horde_step(delta)
 
 
 func _horde_step(delta: float) -> void:
@@ -351,14 +431,12 @@ func _process_chaser(delta: float) -> void:
 
 	_horde_move(delta)
 
-	contact_damage_timer -= delta
+	contact_damage_timer = maxf(0.0, contact_damage_timer - delta)
 
-	if global_position.distance_squared_to(player.global_position) < 1.0:
-		if contact_damage_timer <= 0.0:
-			player.take_damage(
-				_apply_elite_contact_damage(contact_damage)
-			)
-			contact_damage_timer = contact_damage_cooldown
+	# Ordinary contact damage only when the physical contact area overlaps.
+	if contact_damage_timer <= 0.0 and _player_is_in_contact():
+		player.take_damage(_apply_elite_contact_damage(contact_damage))
+		contact_damage_timer = contact_damage_cooldown
 
 	update_sprite_facing()
 
@@ -385,13 +463,14 @@ func _process_charger(delta: float) -> void:
 		&"approach":
 			charger_cooldown_timer -= delta
 
-			if distance_to_player <= charger_punch_range:
+			if _player_is_in_contact():
 				_charger_begin_punch()
 
 			elif charger_cooldown_timer <= 0.0:
 				charger_state = &"windup"
 				charger_state_timer = charger_windup
 				charger_direction = direction
+				CombatVisualManager.warning_line(global_position, charger_direction, charger_rush_speed * charger_rush_duration, 1.0, charger_windup)
 
 				velocity.x = 0.0
 				velocity.z = 0.0
@@ -423,7 +502,7 @@ func _process_charger(delta: float) -> void:
 
 			play_sprite_animation(&"Walk")
 
-			if distance_to_player <= charger_punch_range + 0.4:
+			if _player_is_in_contact():
 				_charger_begin_punch()
 			elif charger_state_timer <= 0.0:
 				_charger_begin_recovery()
@@ -440,11 +519,8 @@ func _process_charger(delta: float) -> void:
 			):
 				charger_punch_damage_applied = true
 
-				var current_distance := global_position.distance_to(
-					player.global_position
-				)
-
-				if current_distance <= charger_punch_range + 0.25:
+				# Punch damage requires real body contact at the hit frame.
+				if _player_is_in_contact():
 					player.take_damage(charger_punch_damage)
 
 			if charger_state_timer <= 0.0:
@@ -527,6 +603,7 @@ func _process_stalker(delta: float) -> void:
 				stalker_state = &"windup"
 				stalker_state_timer = stalker_lunge_windup
 				stalker_lunge_direction = toward_player
+				CombatVisualManager.warning_line(global_position, stalker_lunge_direction, stalker_lunge_speed * stalker_lunge_duration, 0.8, stalker_lunge_windup)
 				velocity.x = 0.0
 				velocity.z = 0.0
 
@@ -554,12 +631,10 @@ func _process_stalker(delta: float) -> void:
 
 			play_sprite_animation(&"Walk")
 
-			if (
-				global_position.distance_to(player.global_position)
-				<= stalker_attack_range
-			):
+			if _player_is_in_contact():
 				stalker_state = &"attack"
 				stalker_state_timer = 0.4
+				CombatVisualManager.warning_circle(global_position, stalker_attack_range + 0.3, 0.2)
 				stalker_attack_damage_applied = false
 				velocity.x = 0.0
 				velocity.z = 0.0
@@ -584,10 +659,9 @@ func _process_stalker(delta: float) -> void:
 			):
 				stalker_attack_damage_applied = true
 
-				if (
-					global_position.distance_squared_to(player.global_position)
-					<= pow(stalker_attack_range + 0.3, 2.0)
-				):
+				# The lunge/attack still telegraphs and animates as before,
+				# but its damage only connects if the bodies are touching.
+				if _player_is_in_contact():
 					player.take_damage(stalker_attack_damage)
 
 			if stalker_state_timer <= 0.0:
@@ -638,10 +712,11 @@ func _process_brute(delta: float) -> void:
 
 	match brute_state:
 		&"approach":
-			if distance_to_player <= brute_attack_range:
+			if _player_is_in_contact():
 				if brute_attack_cooldown_timer <= 0.0:
 					brute_state = &"windup"
 					brute_state_timer = brute_windup_duration
+					CombatVisualManager.warning_circle(global_position, brute_attack_range, brute_windup_duration + brute_attack_animation_duration * 0.5)
 					brute_attack_damage_applied = false
 
 					velocity.x = 0.0
@@ -679,11 +754,8 @@ func _process_brute(delta: float) -> void:
 			):
 				brute_attack_damage_applied = true
 
-				var current_distance_squared := global_position.distance_squared_to(
-					player.global_position
-				)
-
-				if current_distance_squared <= brute_attack_range * brute_attack_range:
+				# The warning circle is unchanged; actual impact needs contact.
+				if _player_is_in_contact():
 					player.take_damage(brute_attack_damage)
 
 			if brute_state_timer <= 0.0:
@@ -733,6 +805,7 @@ func _set_bounded_velocity(
 func _charger_begin_punch() -> void:
 	charger_state = &"punch"
 	charger_state_timer = 0.45
+	CombatVisualManager.warning_circle(global_position, charger_punch_range + 0.25, 0.20)
 	charger_punch_damage_applied = false
 
 	velocity.x = 0.0
@@ -1115,7 +1188,11 @@ func _horde_move(delta: float) -> void:
 
 func _exit_tree() -> void:
 	var scene := get_tree().current_scene
-	if scene != null:
-		var manager := scene.get_node_or_null("HordeManager")
-		if manager != null:
-			manager.unregister_enemy(self)
+
+	if scene == null:
+		return
+
+	var manager := scene.find_child("HordeManager", true, false)
+
+	if manager != null and manager.has_method("unregister_enemy"):
+		manager.unregister_enemy(self)

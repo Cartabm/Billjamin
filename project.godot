@@ -34,6 +34,10 @@ ProjectilePool="*uid://cqe3nqn0r108r"
 DungeonReturnState="*uid://b7f56o6qmswp0"
 CharacterManager="*uid://b0yqlf3ru01v4"
 RunUpgradeState="*uid://suxarstpjoe8"
+InventoryManager="*uid://br26r6383pq3r"
+CharacterDatabase="*uid://dkb0ump5k0h5f"
+CombatSettings="*res://Scripts/CombatSettings.gd"
+CombatVisualManager="*uid://c23ke8yn86mlm"
 
 [display]
 
@@ -45,7 +49,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/cheddaboards/plugin.cfg", "res://addons/godotresourcecleaner/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+enabled=PackedStringArray("res://addons/cheddaboards/plugin.cfg", "res://addons/godotresourcecleaner/plugin.cfg", "res://addons/item_creator/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/upgrade_creator/plugin.cfg")
 
 [filesystem]
 

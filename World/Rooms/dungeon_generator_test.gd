@@ -18,6 +18,9 @@ const MINE_WALL_MATERIAL = preload("res://World/Materials/MineWall_01.tres")
 
 const DIRECTIONS := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const ROOM_RESIZER = preload("res://World/Rooms/dungeon_room_resizer.gd")
+const CAVE_DETAIL = preload("res://World/Rooms/dungeon_cave_detail.gd")
+const ROCK_FILL = preload("res://World/Rooms/dungeon_rock_fill.gd")
+const FOG_OF_WAR_SCRIPT = preload("res://World/Rooms/dungeon_fog_of_war.gd")
 
 @onready var dungeon_settings = $DungeonSettings
 
@@ -28,6 +31,8 @@ func get_grid_spacing() -> float:
 	return dungeon_settings.room_size + dungeon_settings.corridor_length
 
 @export_range(2, 40, 1) var room_count := 12
+@export_group("Centralized Balance")
+@export var balance_profile: EnemyBalanceProfile
 @export_group("DungeonEnemies")
 @export var dungeon_enemy_scenes: Array[PackedScene] = []
 @export_group("Dungeon Boss")
@@ -37,6 +42,7 @@ func get_grid_spacing() -> float:
 @onready var generated_rooms: Node3D = $GeneratedRooms
 @onready var generated_corridors: Node3D = $GeneratedCorridors
 var rng := RandomNumberGenerator.new()
+var fog_of_war
 var connections: Dictionary = {}
 var room_encounters: Dictionary = {}
 var active_room: Vector2i = Vector2i.ZERO
@@ -52,6 +58,34 @@ var dungeon_floor: int = 1
 var dungeon_portal: Node3D
 var floor_label: Label
 const PORTAL_SCRIPT = preload("res://Scripts/DungeonPortal.gd")
+
+func _enter_tree() -> void:
+	if not CharacterManager.has_selected_character():
+		return
+
+	var old_player := get_node_or_null("Player") as Node3D
+	if old_player == null:
+		push_error("Dungeon: Original Player node not found!")
+		return
+
+	var selected_scene: PackedScene = CharacterManager.get_selected_player_scene()
+	if selected_scene == null:
+		push_error("Dungeon: Selected character scene not found!")
+		return
+
+	var spawn_transform := old_player.transform
+
+	remove_child(old_player)
+	old_player.queue_free()
+
+	var new_player := selected_scene.instantiate() as CharacterBody3D
+	if new_player == null:
+		push_error("Dungeon: Selected character must be a CharacterBody3D!")
+		return
+
+	new_player.name = "Player"
+	add_child(new_player)
+	new_player.transform = spawn_transform
 
 func _ready() -> void:
 	rng.randomize()
@@ -111,6 +145,7 @@ func _physics_process(_delta: float) -> void:
 
 		if absf(player.global_position.x - room_center.x) < detection_half_size \
 		and absf(player.global_position.z - room_center.z) < detection_half_size:
+			fog_of_war.reveal_room(player_cell, connections)
 			if minimap != null and minimap.current_room != player_cell:
 				minimap.enter_room(player_cell)
 	if boss_room_created and not boss_spawned and player_cell == boss_room_cell:
@@ -128,7 +163,7 @@ func _physics_process(_delta: float) -> void:
 			var encounter: Node3D = room_encounters[cell]
 			if not encounter.encounter_cleared and not encounter.encounter_active:
 				active_room = cell
-				
+
 				rooms_entered += 1
 				encounter.set_room_difficulty((dungeon_floor - 1) * (room_count - 1) + rooms_entered)
 				encounter.start_encounter()
@@ -137,6 +172,10 @@ func _physics_process(_delta: float) -> void:
 
 
 func generate_dungeon() -> void:
+	if fog_of_war == null or not is_instance_valid(fog_of_war):
+		fog_of_war = FOG_OF_WAR_SCRIPT.new()
+		add_child(fog_of_war)
+	fog_of_war.reset_visits()
 	# Clear any surviving enemies before replacing the geometry.
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if is_instance_valid(enemy):
@@ -231,6 +270,35 @@ func generate_dungeon() -> void:
 				corridor_count += 1
 				print("Generated ", connections.size(), " rooms and ", corridor_count, " corridors.")
 
+	# Cover all unoccupied terrain with one lightweight visual rock mesh.
+	_rebuild_rock_fill()
+	fog_of_war.rebuild(connections, get_room_size(),
+		dungeon_settings.corridor_length, dungeon_settings.doorway_width, WALL_HEIGHT)
+	fog_of_war.reveal_room(Vector2i.ZERO, connections)
+
+
+
+func _rebuild_rock_fill() -> void:
+	var previous := get_node_or_null("GeneratedRockFill")
+	if previous != null:
+		remove_child(previous)
+		previous.queue_free()
+	var fill: MeshInstance3D = ROCK_FILL.build(
+		connections,
+		get_room_size(),
+		dungeon_settings.corridor_length,
+		dungeon_settings.doorway_width,
+		MINE_WALL_MATERIAL,
+		WALL_HEIGHT
+	)
+	add_child(fill)
+
+	# Reuse the lightweight exterior mesh as a continuous fog surface.
+	# The fog script supplies the same material used by room/corridor covers.
+	fill.position.y = (WALL_HEIGHT + 0) - (WALL_HEIGHT - 0.02)
+	if fog_of_war != null and is_instance_valid(fog_of_war):
+		fill.material_override = fog_of_war.get_fog_material()
+	fill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _place_room(cell: Vector2i, openings: Array) -> void:
@@ -255,14 +323,21 @@ func _place_room(cell: Vector2i, openings: Array) -> void:
 
 # Randomize this room's floor and wall appearance.
 	_randomize_room_materials(room)
+	CAVE_DETAIL.decorate_room(room, rng)
 	room.position = Vector3(cell.x * get_grid_spacing(), 0.0, cell.y * get_grid_spacing())
 	room.rotation.y = rotation_steps * PI / 2.0
 	room.name = "Room_%d_%d" % [cell.x, cell.y]
+
 	var encounter := Node3D.new()
 	encounter.name = "RoomEncounter"
 	encounter.set_script(ROOM_ENCOUNTER_SCRIPT)
 	encounter.enemy_scenes = dungeon_enemy_scenes
+
+# Apply this map's centralized balance settings.
+	_apply_encounter_balance(encounter)
+
 	room.add_child(encounter)
+
 	room_encounters[cell] = encounter
 	encounter.progress_changed.connect(_on_room_progress_changed)
 	encounter.encounter_started.connect(_on_room_encounter_started)
@@ -338,7 +413,7 @@ func _randomize_room_materials(room: Node3D) -> void:
 		else:
 			if wall_material != null:
 				mesh.material_override = wall_material
-				
+
 func _rotate_direction(direction: Vector2i, steps: int) -> Vector2i:
 	var result := direction
 	for i in range(steps):
@@ -523,6 +598,9 @@ func _create_boss_room() -> void:
 	# The boss room uses a boss, not the ordinary enemy spawner.
 	room_encounters[boss_room_cell].encounter_cleared = true
 	_create_corridor(parent_cell, boss_room_cell)
+	_rebuild_rock_fill()  # Open the new boss route in the surrounding rock.
+	fog_of_war.rebuild(connections, get_room_size(),
+		dungeon_settings.corridor_length, dungeon_settings.doorway_width, WALL_HEIGHT)
 	boss_room_created = true
 	if minimap != null and minimap.has_method("reveal_boss_room"):
 		minimap.reveal_boss_room(boss_room_cell, connections)
@@ -649,3 +727,89 @@ func _create_floor_hud() -> void:
 	floor_label.position = Vector2(20, 80)
 	floor_label.add_theme_font_size_override("font_size", 23)
 	canvas.add_child(floor_label)
+
+
+func _apply_encounter_balance(encounter: Node3D) -> void:
+	if balance_profile == null:
+		return
+
+	encounter.set("configured_health_multiplier", balance_profile.health_multiplier)
+	encounter.set("configured_damage_multiplier", balance_profile.damage_multiplier)
+	encounter.set("configured_speed_multiplier", balance_profile.speed_multiplier)
+	encounter.set("configured_elite_chance", balance_profile.elite_chance)
+
+	# Configure normal enemy currency rewards.
+	encounter.set("configured_currency_drop_chance", balance_profile.gold_drop_chance)
+	encounter.set("configured_currency_min_drop", balance_profile.gold_minimum)
+	encounter.set("configured_currency_max_drop", balance_profile.gold_maximum)
+
+	# Configure elite enemy currency rewards.
+	encounter.set("configured_elite_currency_drop_chance", balance_profile.elite_gold_drop_chance)
+	encounter.set("configured_elite_currency_min_drop", balance_profile.elite_gold_minimum)
+	encounter.set("configured_elite_currency_max_drop", balance_profile.elite_gold_maximum)
+
+
+
+
+	# Build a properly typed array for the room encounter.
+	var spawn_weights: Array[int] = [
+		balance_profile.stalker_weight,
+		balance_profile.charger_weight,
+		balance_profile.brute_weight,
+		balance_profile.regular_weight,
+		balance_profile.ranged_weight
+	]
+
+	encounter.set("enemy_spawn_weights", spawn_weights)
+
+	print("Dungeon enemy weights assigned: ", spawn_weights)
+
+
+
+	# Base encounter settings.
+	encounter.set(
+		"kills_required",
+		balance_profile.dungeon_kills_required
+	)
+	encounter.set(
+		"max_alive",
+		balance_profile.dungeon_max_alive
+	)
+	encounter.set(
+		"initial_spawn_count",
+		balance_profile.dungeon_initial_spawn
+	)
+	encounter.set(
+		"enemies_per_spawn_tick",
+		balance_profile.dungeon_enemies_per_tick
+	)
+	encounter.set(
+		"spawn_interval",
+		balance_profile.dungeon_spawn_interval
+	)
+
+	# Difficulty scaling per room.
+	encounter.set(
+		"health_increase_per_room",
+		balance_profile.dungeon_health_increase_per_room
+	)
+	encounter.set(
+		"damage_increase_per_room",
+		balance_profile.dungeon_damage_increase_per_room
+	)
+	encounter.set(
+		"enemy_count_increase_per_room",
+		balance_profile.dungeon_enemy_count_increase_per_room
+	)
+	encounter.set(
+		"extra_alive_every_rooms",
+		balance_profile.dungeon_extra_alive_every_rooms
+	)
+	encounter.set(
+		"spawn_speed_increase_per_room",
+		balance_profile.dungeon_spawn_speed_increase_per_room
+	)
+	encounter.set(
+		"minimum_spawn_interval",
+		balance_profile.dungeon_minimum_spawn_interval
+	)

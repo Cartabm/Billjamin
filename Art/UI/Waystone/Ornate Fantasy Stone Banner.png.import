@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjivwmwdsxa23"
-path="res://.godot/imported/Increased_Range.png-1f6565cbdf840f025bc429fa2196451c.ctex"
+uid="uid://bo6l4vb2qm46n"
+path="res://.godot/imported/Ornate Fantasy Stone Banner.png-25d1e8c1f30b36a087d86d9fb9f46264.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/UI/Cards_Icons/Increased_Range.png"
-dest_files=["res://.godot/imported/Increased_Range.png-1f6565cbdf840f025bc429fa2196451c.ctex"]
+source_file="res://Art/UI/Waystone/Ornate Fantasy Stone Banner.png"
+dest_files=["res://.godot/imported/Ornate Fantasy Stone Banner.png-25d1e8c1f30b36a087d86d9fb9f46264.ctex"]
 
 [params]
 

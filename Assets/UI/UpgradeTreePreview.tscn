@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://doqekn0dcheyx"]
+
+[ext_resource type="Script" uid="uid://b78mncbve5dh3" path="res://Assets/UI/UpgradeTreePreview.gd" id="1_g0qeg"]
+
+[node name="UpgradeTreePreview" type="CanvasLayer" unique_id=1987764157]
+layer = 10
+visible = false
+
+[node name="UpgradeTreeUI" type="Control" parent="." unique_id=944338409]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_g0qeg")

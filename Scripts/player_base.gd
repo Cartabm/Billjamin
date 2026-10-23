@@ -1,15 +1,17 @@
 extends CharacterBody3D
-## Shared player stats, XP, health, HUD, kills, and death handling.
-## Class scripts inherit from this; do not attach it to a Control node.
+## Shared health, dodge energy, leveling, HUD, upgrades and run state.
+## character_controller.gd inherits this. Keep game rules here, not class AI.
 
 @export_group("Movement / Survival")
 @export var move_speed: float = 6.0
 @export var gravity: float = 20.0
 @export var max_health: int = 100
-@export var contact_damage_cooldown: float = 1.0
+@export var contact_damage_cooldown: float = 0.2
 @export var dodge_speed: float = 16.0
 @export var dodge_duration: float = 0.5
-@export var dodge_cooldown: float = 7.0
+@export var max_dodge_energy: float = 100.0
+@export var dodge_energy_cost: float = 50.0
+@export var dodge_energy_regen: float = 10.0
 
 @export_group("Progression")
 @export var xp_to_level: int = 5
@@ -29,8 +31,15 @@ var ricochet_stacks: int = 0
 var multishot_count: int = 1
 var attack_range_multiplier: float = 1.0
 
+@export_group("Blade Flurry")
+@export var blade_flurry_level: int = 0
+@export var blade_flurry_damage: int = 6
+@export var blade_flurry_radius: float = 3.0
+@export var blade_flurry_cooldown: float = 6.0
+@export var blade_flurry_damage_per_milestone: int = 2
 
 var projectile_damage: int = 10
+var ranged_projectile_damage_bonus: int = 0
 var fire_rate: float = 0.40
 var godmode_enabled: bool = false
 var is_invulnerable: bool = false
@@ -38,22 +47,35 @@ var is_dead: bool = false
 var player_health_bar: Control = null
 var upgrade_menu: Control = null
 var hurt_cooldown_remaining: float = 0.0
-var dodge_cooldown_remaining: float = 0.0
+var dodge_energy: float = 100.0
 var dodge_time_remaining: float = 0.0
 var dodge_direction: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	add_to_group("player")
 	current_health = max_health
+	dodge_energy = max_dodge_energy
 	run_time_seconds = 0.0
 	run_ended = false
 	call_deferred("_initialize_game_hud")
+	if not has_node("BladeFlurry"):
+		var blade_flurry = preload("res://Scripts/BladeFlurry.gd").new()
+		blade_flurry.name = "BladeFlurry"
+		add_child(blade_flurry)
+	if not has_node("RangeIndicator"):
+		var indicator = preload("res://Scripts/RangeIndicator.gd").new()
+		indicator.name = "RangeIndicator"
+		add_child(indicator)
 
 func _initialize_game_hud() -> void:
-	var root := get_tree().current_scene
+	if not is_inside_tree():
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	var root := tree.current_scene
 	if root == null:
 		return
-	# Locate the bar by its actual child, even if the HUD root has a different name.
 	var fill := root.find_child("HealthFill", true, false)
 	if fill != null:
 		var candidate := fill.get_parent()
@@ -65,13 +87,21 @@ func _initialize_game_hud() -> void:
 			player_health_bar = candidate as Control
 	upgrade_menu = root.find_child("UpgradeMenu", true, false) as Control
 	if player_health_bar == null:
-		push_warning("PlayerBase: HUD bar not found. Check that HealthFill is a child of the Control with the health/XP script.")
+		push_warning("PlayerBase: PlayerHealthBar / HealthFill not found in active scene.")
 	else:
 		player_health_bar.call_deferred("set_health_immediate", float(current_health) / float(maxi(max_health, 1)))
 		player_health_bar.call_deferred("set_health_values", current_health, max_health)
 		player_health_bar.call_deferred("set_player_level", player_level)
 		player_health_bar.call_deferred("set_xp_immediate", float(current_xp) / float(maxi(xp_to_level, 1)))
 	_update_labels()
+
+func _process(delta: float) -> void:
+	if hurt_cooldown_remaining > 0.0:
+		hurt_cooldown_remaining = maxf(0.0, hurt_cooldown_remaining - delta)
+	if not is_dead and not run_ended:
+		dodge_energy = minf(max_dodge_energy, dodge_energy + dodge_energy_regen * delta)
+	if is_instance_valid(player_health_bar) and player_health_bar.has_method("set_dodge_energy"):
+		player_health_bar.set_dodge_energy(dodge_energy, max_dodge_energy)
 
 func take_damage(amount: int) -> void:
 	if is_dead or godmode_enabled or is_invulnerable or hurt_cooldown_remaining > 0.0:
@@ -98,16 +128,13 @@ func refresh_health(animated: bool = false) -> void:
 func gain_xp(amount: int) -> void:
 	if is_dead or amount <= 0:
 		return
-	var multiplier := minf(xp_multiplier, 10.0)
-	current_xp += roundi(float(amount) * multiplier)
+	current_xp += roundi(float(amount) * minf(xp_multiplier, 10.0))
 	var leveled_up := false
-	var levels_gained := 0
 	while current_xp >= xp_to_level:
 		current_xp -= xp_to_level
 		player_level += 1
 		xp_to_level += 2
 		leveled_up = true
-		levels_gained += 1
 	if not is_instance_valid(player_health_bar):
 		_initialize_game_hud()
 	if is_instance_valid(player_health_bar):
@@ -143,7 +170,7 @@ func _update_labels() -> void:
 		kills_label.text = "Kills: %d" % kill_count
 
 func upgrade_critical_strike() -> void:
-	pass # Class-specific implementation overrides this.
+	pass
 
 func die() -> void:
 	run_ended = true
@@ -156,3 +183,17 @@ func die() -> void:
 
 func increased_attack_range() -> void:
 	attack_range_multiplier += 0.05
+
+func get_attack_damage_bonus(attack_tags: Array[String]) -> int:
+	if attack_tags.has("ranged") or attack_tags.has("projectile"):
+		return ranged_projectile_damage_bonus
+	return 0
+
+func try_spend_dodge_energy() -> bool:
+	if dodge_energy < dodge_energy_cost:
+		return false
+	dodge_energy -= dodge_energy_cost
+	return true
+
+func get_dodge_energy_percent() -> float:
+	return clampf(dodge_energy / maxf(max_dodge_energy, 1.0), 0.0, 1.0)

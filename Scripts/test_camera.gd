@@ -1,4 +1,3 @@
-
 extends Camera3D
 
 @export_group("Zoom Settings")
@@ -12,12 +11,22 @@ extends Camera3D
 
 var camera_offset: Vector3
 
+
 func _ready() -> void:
-	if follow_target != null:
-		camera_offset = global_position - follow_target.global_position
+	# Automatically find the character spawned by CharacterManager.
+	follow_target = get_parent().get_node_or_null("Player") as Node3D
+
+	if follow_target == null:
+		push_warning("TestCamera: Player not found.")
+		return
+
+	camera_offset = global_position - follow_target.global_position
+
+	print("TestCamera following: ", follow_target.name)
+
 
 func _process(delta: float) -> void:
-	if follow_target == null:
+	if not is_instance_valid(follow_target):
 		return
 
 	var target_position := follow_target.global_position + camera_offset
@@ -26,6 +35,7 @@ func _process(delta: float) -> void:
 		target_position,
 		clampf(follow_speed * delta, 0.0, 1.0)
 	)
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:

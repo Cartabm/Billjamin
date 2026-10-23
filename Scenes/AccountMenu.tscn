@@ -15,8 +15,9 @@ script = ExtResource("1_w7o65")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=793699683]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -185.0
+offset_right = 192.0
+offset_bottom = 232.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=666939935]
 layout_mode = 2
@@ -40,6 +41,7 @@ text = "LEEME IN!"
 
 [node name="CreateAccountButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=733592068]
 layout_mode = 2
+theme_override_constants/h_separation = 11
 text = "Create Account Scrub."
 
 [node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=723472836]

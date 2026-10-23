@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://ccana8j5bbk36"]
+
+[ext_resource type="Script" uid="uid://tmdi1k4xksna" path="res://Scenes/character_inventory.gd" id="1_q2q6e"]
+
+[node name="CharacterInventory" type="Control" unique_id=1735456495]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q2q6e")
+
+[node name="InventoryPanel" type="PanelContainer" parent="." unique_id=350437524]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 600.0
+offset_bottom = 298.0
+
+[node name="InventoryGrid" type="GridContainer" parent="InventoryPanel" unique_id=1595519311]
+layout_mode = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 10
+
+[node name="ItemLayer" type="Control" parent="." unique_id=1912848907]
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 600.0
+offset_bottom = 298.0
+
+[node name="DragHeader" type="Panel" parent="." unique_id=1078963384]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 70.0
+offset_right = 600.0
+offset_bottom = 100.0
+
+[connection signal="gui_input" from="DragHeader" to="." method="_on_drag_header_gui_input"]

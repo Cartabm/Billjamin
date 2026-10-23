@@ -20,6 +20,13 @@ var reroll_button: Button
 var ban_overlays: Dictionary = {}
 var owned_upgrades: Dictionary = {} # Button name -> number of times selected
 
+# New resource-driven upgrades use one reusable scene copied from PowerShotButton.
+# Existing buttons continue working exactly as before.
+const UPGRADE_DATA_DIRECTORY := "res://Upgrades/Data"
+const RESOURCE_CARD_SCENE_PATH := "res://Upgrades/UpgradeCardStyled.tscn"
+var resource_upgrades: Dictionary = {} # Button name -> UpgradeData
+var resource_buttons: Array[Button] = []
+
 const BUTTON_NAMES: Array[String] = [
 	"PowerShotButton",
 	"RapidFireButton",
@@ -31,8 +38,59 @@ const BUTTON_NAMES: Array[String] = [
 	"ToughSkinButton",
 	"CriticalStrikeButton",
 	"RicochetButton",
-	"IncreasedRangeButton"
+	"IncreasedRangeButton",
+	"BladeFlurryButton"
 ]
+
+
+# Tags restrict an upgrade to matching character combat types.
+# An empty list means the upgrade is available to all combat types.
+# Multiple tags are ALL required (e.g. ranged + physical).
+#
+# Existing characters work immediately through CharacterManager.
+# For a future character, add its name to CHARACTER_TAGS, or set
+# "upgrade_tags" metadata on the player's root node in the Inspector.
+const CHARACTER_TAGS := {
+	"archer": ["ranged", "physical"],
+	"rogue": ["melee", "physical"]
+}
+
+# Default tags for existing upgrade cards.
+# These can be overridden by "upgrade_tags" metadata on an individual button.
+const UPGRADE_TAGS := {
+	"PowerShotButton": ["ranged", "physical"],
+	"RapidFireButton": ["ranged"],
+	"SwiftFeetButton": [],
+	"SwarmcallerButton": [],
+	"ExperienceBoostButton": [],
+	"MultishotButton": ["ranged"],
+	"MaxHealthButton": [],
+	"ToughSkinButton": [],
+	"CriticalStrikeButton": [],
+	"RicochetButton": ["ranged"],
+	"IncreasedRangeButton": [],
+	"BladeFlurryButton": []
+}
+
+
+func _player_upgrade_tags() -> Array[String]:
+	return CharacterManager.get_selected_class_tags()
+
+
+func _upgrade_matches_player(button: Button) -> bool:
+	if button == null:
+		return false
+
+	# Per-card metadata takes priority over the default table.
+	var required_tags: Variant = button.get_meta(
+		"upgrade_tags",
+		UPGRADE_TAGS.get(String(button.name), [])
+	)
+	var player_tags := _player_upgrade_tags()
+	for tag in required_tags:
+		if not player_tags.has(String(tag).strip_edges().to_lower()):
+			return false
+	return true
 
 
 func _find_player() -> CharacterBody3D:
@@ -70,6 +128,9 @@ func _can_apply_upgrade(button_name: String) -> bool:
 	if player == null or not is_instance_valid(player):
 		return false
 
+	if resource_upgrades.has(button_name):
+		return _can_apply_resource_upgrade(resource_upgrades[button_name])
+
 	match button_name:
 		"PowerShotButton":
 			return _has_property(player, "projectile_damage")
@@ -94,23 +155,86 @@ func _can_apply_upgrade(button_name: String) -> bool:
 			return _has_property(player, "ricochet_stacks") and int(player.get("ricochet_stacks")) < 3
 		"IncreasedRangeButton":
 			return player.has_method("increased_attack_range")
+		"BladeFlurryButton":
+			return _has_property(player, "blade_flurry_level") and int(player.get("blade_flurry_level")) < 20
 	return false
+
+
+func _load_resource_upgrade_cards() -> void:
+	if card_row == null:
+		return
+	if not ResourceLoader.exists(RESOURCE_CARD_SCENE_PATH):
+		push_warning("UpgradeMenu: Styled card template not found at " + RESOURCE_CARD_SCENE_PATH)
+		return
+	var directory := DirAccess.open(UPGRADE_DATA_DIRECTORY)
+	if directory == null:
+		push_warning("UpgradeMenu: Upgrade data folder not found: " + UPGRADE_DATA_DIRECTORY)
+		return
+
+	var card_scene := load(RESOURCE_CARD_SCENE_PATH) as PackedScene
+	if card_scene == null:
+		push_warning("UpgradeMenu: Styled card template is not a PackedScene.")
+		return
+
+	for file_name in directory.get_files():
+		var resource_name := String(file_name)
+		if resource_name.ends_with(".remap"):
+			resource_name = resource_name.trim_suffix(".remap")
+		if not resource_name.ends_with(".tres"):
+			continue
+		var path := UPGRADE_DATA_DIRECTORY.path_join(resource_name)
+		var data := load(path) as UpgradeData
+		if data == null:
+			continue
+		var button_name := "Resource_" + resource_name.get_basename()
+		if resource_upgrades.has(button_name):
+			continue
+		var button := card_scene.instantiate() as Button
+		if button == null:
+			push_error("UpgradeMenu: Styled card scene root must be a Button.")
+			return
+		button.name = button_name
+		card_row.add_child(button)
+		if button.has_method("set_upgrade"):
+			button.call("set_upgrade", data)
+		else:
+			push_error("UpgradeMenu: Styled card is missing UpgradeCard.gd script.")
+			button.queue_free()
+			continue
+		button.set_meta("upgrade_tags", data.required_tags)
+		resource_upgrades[button_name] = data
+		resource_buttons.append(button)
+
+
+func _can_apply_resource_upgrade(data: UpgradeData) -> bool:
+	if data == null or data.effects.is_empty():
+		return false
+	for effect in data.effects:
+		if effect == null or effect.stat_name.strip_edges().is_empty():
+			return false
+		if not _has_property(player, effect.stat_name.strip_edges()):
+			return false
+		var value: Variant = player.get(effect.stat_name.strip_edges())
+		if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+			return false
+	return true
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_refresh_player()
+	_load_resource_upgrade_cards()
 	if player == null:
 		push_warning("UpgradeMenu: Player not found yet; will search when the menu opens.")
 	if card_row == null:
 		push_error("UpgradeMenu: CardRow node not found.")
 
 	for button_name in BUTTON_NAMES:
-		var button := find_child(button_name, true, false) as Button
-		if button == null:
+		if find_child(button_name, true, false) == null:
 			push_warning("UpgradeMenu: missing button " + button_name)
-			continue
 
+	for button in _all_buttons():
+		var button_name := String(button.name)
 		var normal_style: StyleBox = button.get_theme_stylebox("normal")
 		if normal_style != null:
 			button.add_theme_stylebox_override("hover", normal_style)
@@ -144,11 +268,22 @@ func _all_buttons() -> Array[Button]:
 		var button := find_child(button_name, true, false) as Button
 		if button != null:
 			buttons.append(button)
+	for button in resource_buttons:
+		if is_instance_valid(button):
+			buttons.append(button)
 	return buttons
 
 
 func _is_upgrade_available(button: Button) -> bool:
-	if button == null or not _can_apply_upgrade(String(button.name)):
+	if button == null or not _upgrade_matches_player(button):
+		return false
+	if not _can_apply_upgrade(String(button.name)):
+		return false
+	if resource_upgrades.has(String(button.name)):
+		var data: UpgradeData = resource_upgrades[String(button.name)]
+		if int(owned_upgrades.get(String(button.name), 0)) >= maxi(1, data.max_stacks):
+			return false
+	if String(button.name) == "BladeFlurryButton" and int(owned_upgrades.get("BladeFlurryButton", 0)) >= 20:
 		return false
 	if RunUpgradeState.banned_upgrades.has(String(button.name)):
 		return false
@@ -158,6 +293,7 @@ func _is_upgrade_available(button: Button) -> bool:
 
 
 func randomize_upgrade_choices() -> Array[Button]:
+
 	_hide_all_card_controls()
 	var available: Array[Button] = []
 	for button in _all_buttons():
@@ -236,10 +372,24 @@ func _apply_upgrade(button_name: String) -> void:
 		_ban_card(button)
 		return
 
+	# New data-driven cards apply all effects without an additional match case.
+	if resource_upgrades.has(button_name):
+		var data: UpgradeData = resource_upgrades[button_name]
+		if not UpgradeApplier.apply_upgrade(data, player):
+			push_warning("UpgradeMenu: Failed to apply " + data.upgrade_name)
+			return
+		if player.has_method("refresh_health"):
+			player.call("refresh_health", false)
+		owned_upgrades[button_name] = int(owned_upgrades.get(button_name, 0)) + 1
+		close_upgrade_menu()
+		return
+
 	match button_name:
 		"PowerShotButton":
-			player.set("projectile_damage", player.get("projectile_damage") + 2)
-		"RapidFireButton":
+			player.set(
+				"ranged_projectile_damage_bonus",
+				int(player.get("ranged_projectile_damage_bonus")) +2
+			)
 			if _has_property(player, "attack_interval"):
 				player.set("attack_interval", player.get("attack_interval") * 0.85)
 			else:
@@ -274,13 +424,14 @@ func _apply_upgrade(button_name: String) -> void:
 			player.call("upgrade_critical_strike")
 		"IncreasedRangeButton":
 			player.call("increased_attack_range")
+		"BladeFlurryButton":
+			player.set("blade_flurry_level", mini(int(player.get("blade_flurry_level")) + 1, 20))
 		"RicochetButton":
 			player.set("ricochet_stacks", mini(int(player.get("ricochet_stacks")) + 1, 3))
 		_:
 			return
 
 	owned_upgrades[button_name] = int(owned_upgrades.get(button_name, 0)) + 1
-	print("Unique upgrades: %d/%d | %s level %d" % [owned_upgrades.size(), max_unique_upgrades, button_name, owned_upgrades[button_name]])
 	close_upgrade_menu()
 
 

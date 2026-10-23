@@ -2,32 +2,48 @@
 extends CanvasLayer
 
 @onready var portal_prompt: Control = $PortalPrompt
-@onready var yes_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/YesButton
-@onready var no_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/NoButton
-@onready var arena_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/ArenaButton
-@onready var overworld_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/OverworldButton
+
+@onready var proving_grounds_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/ProvingGroundsButton
+@onready var crucible_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/CrucibleButton
+@onready var wilds_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/WildsButton
+@onready var depths_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/DepthsButton
+@onready var return_button: Button = $PortalPrompt/PanelContainer/VBoxContainer/ReturnButton
 
 
 func _ready() -> void:
-	yes_button.pressed.connect(_on_yes_pressed)
-	no_button.pressed.connect(_on_no_pressed)
-	arena_button.pressed.connect(_on_arena_pressed)
-	overworld_button.pressed.connect(_on_overworld_pressed)
+	proving_grounds_button.pressed.connect(_on_proving_grounds_pressed)
+	crucible_button.pressed.connect(_on_crucible_pressed)
+	wilds_button.pressed.connect(_on_wilds_pressed)
+	depths_button.pressed.connect(_on_depths_pressed)
+	return_button.pressed.connect(_on_return_pressed)
 
 	portal_prompt.hide()
 
 
-func _on_yes_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/game.tscn")
+func _on_proving_grounds_pressed() -> void:
+	travel_to("res://Scenes/game.tscn")
 
 
-func _on_no_pressed() -> void:
+func _on_crucible_pressed() -> void:
+	travel_to("res://Scenes/arena.tscn")
+
+
+func _on_wilds_pressed() -> void:
+	travel_to("res://Art/Environment/OverworldTest.tscn")
+
+
+func _on_depths_pressed() -> void:
+	travel_to("res://World/Rooms/DungeonGeneratorTest.tscn")
+
+
+func _on_return_pressed() -> void:
 	portal_prompt.hide()
 
 
-func _on_arena_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/arena.tscn")
+func travel_to(scene_path: String) -> void:
+	if not ResourceLoader.exists(scene_path):
+		push_error("Waystone destination not found: " + scene_path)
+		return
 
-
-func _on_overworld_pressed() -> void:
-	get_tree().change_scene_to_file("res://Art/Environment/OverworldTest.tscn")
+	get_tree().paused = false
+	get_tree().change_scene_to_file(scene_path)

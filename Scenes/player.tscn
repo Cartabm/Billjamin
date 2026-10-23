@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://5sgy0k2htp7b"]
 
-[ext_resource type="Script" uid="uid://beta1agqrslpv" path="res://Scripts/player.gd" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://b7h1ynst1g22n" path="res://Scripts/character_controller.gd" id="1_4flbx"]
 [ext_resource type="Texture2D" uid="uid://dhhpakt24xpdl" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Attack03.png" id="3_b26j0"]
 [ext_resource type="Texture2D" uid="uid://ctp02arto5rfy" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Death.png" id="4_n7ghd"]
 [ext_resource type="Texture2D" uid="uid://523vxbnpvu5f" path="res://Assets/2D Project/Tiny RPG Character Asset Pack 01 v2.0 -Free Soldier&Orc/Characters(100x100 split)/Soldier/Soldier/Soldier_Hurt.png" id="5_nvl01"]
@@ -12,6 +12,7 @@
 [ext_resource type="AudioStream" uid="uid://bxkd6o06n8jy0" path="res://Assets/Audio/Bow_Release.wav" id="11_nvl01"]
 [ext_resource type="AudioStream" uid="uid://bm0amoqkwm7wi" path="res://Assets/Audio/Player_Hurt.wav" id="12_ivps1"]
 [ext_resource type="AudioStream" uid="uid://beabnivjm7obb" path="res://Assets/Audio/Death.wav" id="13_urp6f"]
+[ext_resource type="Resource" path="res://Balance/ArcherBalance.tres" id="character_balance"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ek0cf"]
 radius = 0.4
@@ -359,17 +360,14 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="Player" type="CharacterBody3D" unique_id=2007028265 node_paths=PackedStringArray("archer_animation_player", "archer_visual")]
+[node name="Player" type="CharacterBody3D" unique_id=2007028265 node_paths=PackedStringArray("visual_root", "animation_player", "character_sprite")]
 transform = Transform3D(1.0000001, -1.6734703e-10, 0, -3.2014214e-10, 1.0000001, -4.656613e-10, 9.313226e-10, 0, 1.0000001, 0, 0, 0)
-collision_mask = 3
+collision_mask = 7
 script = ExtResource("1_4flbx")
-auto_fire_enabled = true
-Auto_fire_range = 20.0
-use_archer_animations = true
-archer_animation_player = NodePath("Billjamin_Archer_V5/AnimationPlayer")
-archer_visual = NodePath("Billjamin_Archer_V5")
-face_camera_direction = true
-health_bar_screen_offset = Vector2(0, 400)
+balance_profile = ExtResource("character_balance")
+visual_root = NodePath("Billjamin_Archer_V5")
+animation_player = NodePath("Billjamin_Archer_V5/AnimationPlayer")
+character_sprite = NodePath("CharacterSprite")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1365250180]
 visible = false
@@ -394,8 +392,9 @@ animation = &"Walk"
 frame_progress = 0.6809811
 
 [node name="Billjamin_Archer_V5" parent="." unique_id=372439789 instance=ExtResource("10_n7ghd")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="Skeleton3D" parent="Billjamin_Archer_V5" index="0" unique_id=1971349575]
+[node name="Skeleton3D" parent="Billjamin_Archer_V5" index="0" unique_id=1805314343]
 bones/3/rotation = Quaternion(0, 0, 0.41469324, 0.9099613)
 bones/6/rotation = Quaternion(0, 0, -0.41469324, 0.9099613)
 

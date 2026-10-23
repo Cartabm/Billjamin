@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cbyrldcdwylyf"]
+
+[ext_resource type="Script" uid="uid://cj7mml8wfet7p" path="res://Upgrades/UpgradeCard.gd" id="1_6p3e3"]
+
+[node name="UpgradeCard" type="Button" unique_id=136271336]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6p3e3")
+
+[node name="UpgradeIcon" type="TextureRect" parent="." unique_id=1637749000]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UpgradeText" type="RichTextLabel" parent="." unique_id=874997477]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

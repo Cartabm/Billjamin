@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CharacterBalance" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/CharacterBalance.gd" id="1_balance"]
+
+[resource]
+script = ExtResource("1_balance")
+character_label = "Rogue"
+combat_style = 0
+facing_mode = 1
+move_speed = 6.0
+acceleration = 30.0
+turn_speed = 12.0
+max_health = 100
+contact_damage_cooldown = 0.2
+dodge_visual_spin = false
+starting_damage = 10
+attack_interval = 0.4
+attack_range = 5.0
+auto_attack_enabled = true
+manual_attack_enabled = false
+attack_animation_speed = 1.0
+melee_windup = 0.25
+melee_attack_angle = 90.0
+follow_target_during_windup = true
+blade_flurry_radius = 5.0
+blade_flurry_cooldown = 4.0
+submit_leaderboard_on_death = false
+idle_animation = &"Idle"
+run_animation = &"Run"
+attack_animation = &"Dagger_Attack"
+hurt_animation = &"Hurt"
+death_animation = &"Death"

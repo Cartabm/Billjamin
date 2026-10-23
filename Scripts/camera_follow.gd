@@ -8,7 +8,8 @@ extends Camera3D
 @export var angle_down: float = 15.0
 
 @export var shoulder_offset: float = 0.8
-@export var camera_height: float = 1.6
+@export var camera_height: float = 1.0
+@export var minimum_camera_ground_height: float = 1.0
 
 @export var room_rotation_duration: float = 0.75
 @export var mouse_sensitivity: float = 0.2
@@ -105,11 +106,19 @@ func update_camera_position() -> void:
 		-sin(yaw)
 	)
 
-	global_position = target + Vector3(
+	var desired_position := target + Vector3(
 		backward.x * horizontal_distance,
 		distance * sin(pitch),
 		backward.z * horizontal_distance
 	) + right * shoulder_offset
+
+# Prevent the camera from dropping beneath the ground.
+	desired_position.y = maxf(
+		desired_position.y,
+		minimum_camera_ground_height
+	)
+
+	global_position = desired_position
 
 	look_at(target + Vector3(0.0, 0.2, 0.0), Vector3.UP)
 

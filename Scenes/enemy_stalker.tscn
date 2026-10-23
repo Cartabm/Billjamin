@@ -342,21 +342,21 @@ contact_damage_cooldown = 1.0
 transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
 visible = false
 
-[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" parent_id_path=PackedInt32Array(345412314, 1583117048) index="0" unique_id=1267743977]
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" parent_id_path=PackedInt32Array(345412314, 165251839) index="0" unique_id=1115411950]
 bones/7/rotation = Quaternion(-0.39071882, -0.00025390706, 0.000107201646, 0.9205102)
 
-[node name="Demon" parent="MonsterVisual/CharacterArmature/Skeleton3D" index="0" unique_id=1863947974]
+[node name="Demon" parent="MonsterVisual/CharacterArmature/Skeleton3D" index="0" unique_id=2114939013]
 visible = false
 
-[node name="Trident" parent="MonsterVisual/CharacterArmature/Skeleton3D" index="1" unique_id=1421994105]
+[node name="Trident" parent="MonsterVisual/CharacterArmature/Skeleton3D" index="1" unique_id=479159097]
 visible = false
 
-[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=107495399]
+[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=997331775]
 autoplay = &"Walk"
 
 [node name="BlueDemon2" parent="MonsterVisual" unique_id=1412481100 instance=ExtResource("3_2fhdx")]
 
-[node name="Skeleton3D" parent="MonsterVisual/BlueDemon2/CharacterArmature" parent_id_path=PackedInt32Array(1412481100, 646255135) index="0" unique_id=1539389334]
+[node name="Skeleton3D" parent="MonsterVisual/BlueDemon2/CharacterArmature" parent_id_path=PackedInt32Array(1412481100, 447485798) index="0" unique_id=677975971]
 bones/2/rotation = Quaternion(-3.5526934e-15, 1.1920933e-07, -8.470341e-22, 1)
 bones/4/rotation = Quaternion(0.16683151, 4.3189968e-07, 1.031202e-07, 0.9859854)
 bones/5/rotation = Quaternion(0.09618958, -8.2847305e-07, 2.1512408e-08, 0.99536306)

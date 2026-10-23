@@ -21,6 +21,9 @@ offset_bottom = 40.0
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=167894246]
 layout_mode = 2
 
+[node name="SavedCharactersList" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1023524113]
+layout_mode = 2
+
 [node name="ArcherButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=139682670]
 layout_mode = 2
 text = "Play Ranged"
@@ -32,3 +35,53 @@ text = "Play Lilrock819"
 [node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=706781510]
 layout_mode = 2
 text = "Back"
+
+[node name="DeleteCharacterButton" type="Button" parent="." unique_id=595719714]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 784.0
+offset_top = 493.0
+offset_right = 954.0
+offset_bottom = 533.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Delete Character"
+
+[node name="DeleteCharacterDialog" type="ConfirmationDialog" parent="." unique_id=922557472]
+cancel_button_text = "Delete Character"
+
+[node name="DeleteContent" type="VBoxContainer" parent="DeleteCharacterDialog" unique_id=408714056]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="WarningLabel" type="Label" parent="DeleteCharacterDialog/DeleteContent" unique_id=588905533]
+layout_mode = 2
+text = "Select the character you want to permently delete."
+
+[node name="CharacterList" type="OptionButton" parent="DeleteCharacterDialog/DeleteContent" unique_id=443692868]
+layout_mode = 2
+
+[node name="InstructionLabel" type="Label" parent="DeleteCharacterDialog/DeleteContent" unique_id=20900912]
+layout_mode = 2
+text = "Type CONFIRM DELETE to permanently erase this character, including leaderboard scores, character stash (not shared tab) and any other information connected to it. This cannot be reversed."
+
+[node name="ConfirmInput" type="LineEdit" parent="DeleteCharacterDialog/DeleteContent" unique_id=945451411]
+layout_mode = 2
+
+[node name="CharacterNameDialog" type="ConfirmationDialog" parent="." unique_id=1895962073]
+title = "Character"
+ok_button_text = "Create Character"
+dialog_text = "Enter a name"
+
+[node name="NameContent" type="VBoxContainer" parent="CharacterNameDialog" unique_id=2044836620]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CharacterNameInput" type="LineEdit" parent="CharacterNameDialog/NameContent" unique_id=1564195055]
+layout_mode = 2
+placeholder_text = "Character Name"
+max_length = 20

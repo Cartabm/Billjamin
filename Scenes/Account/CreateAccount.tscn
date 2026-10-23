@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://dr63osyshclnn"]
+
+[ext_resource type="Script" uid="uid://bkxltffuksw5v" path="res://Scenes/Account/CreateAccount.gd" id="1_hw8t8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jcfjo"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(0.16078432, 0.16078432, 0.16078432, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.46666667, 0.46666667, 0.46666667, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="CreateAccount" type="Control" unique_id=1945147004]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hw8t8")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1062575299]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2123369149]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1545240956]
+layout_mode = 2
+text = "Create Account"
+
+[node name="EmailInput" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=792893436]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_jcfjo")
+placeholder_text = "Email"
+alignment = 1
+
+[node name="PasswordInput" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=67945586]
+layout_mode = 2
+placeholder_text = "Password"
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1888880220]
+layout_mode = 2
+text = "Confirm"
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1291577561]
+layout_mode = 2
+text = "Back"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1767853035]
+layout_mode = 2
+
+[node name="VerificationTimer" type="Timer" parent="." unique_id=319656987]
+wait_time = 10.0

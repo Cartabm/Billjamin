@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://3mluckdajvch"]
+
+[ext_resource type="Texture2D" uid="uid://cno0twq1jb43v" path="res://Assets/UI/Cards_Icons/Gothic Obsidian Fantasy UI Frame.png" id="1_vblok"]
+[ext_resource type="Script" uid="uid://cj7mml8wfet7p" path="res://Upgrades/UpgradeCard.gd" id="2_lmdp2"]
+[ext_resource type="Texture2D" uid="uid://153y3rqtygci" path="res://Assets/UI/Cards_Icons/Icon_Power_Shot.png" id="2_yxlt4"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e36ub"]
+texture = ExtResource("1_vblok")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hb5m1"]
+texture = ExtResource("1_vblok")
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+
+[node name="PowerShotButton2" type="Button" unique_id=1878149576]
+custom_minimum_size = Vector2(300, 420)
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_focus_color = Color(0.19793698, 0.19793728, 0.1979377, 1)
+theme_override_colors/font_hover_color = Color(0.90654856, 0.7825358, 0.39597502, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_e36ub")
+theme_override_styles/hover = SubResource("StyleBoxTexture_hb5m1")
+text = "
+"
+script = ExtResource("2_lmdp2")
+
+[node name="AbilityIcon" type="TextureRect" parent="." unique_id=666510644]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 80.0
+offset_right = 225.0
+offset_bottom = 230.0
+texture = ExtResource("2_yxlt4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CardText" type="VBoxContainer" parent="." unique_id=616927909]
+layout_mode = 1
+offset_left = 30.0
+offset_top = 245.0
+offset_right = 270.0
+offset_bottom = 345.0
+
+[node name="UpgradeName" type="Label" parent="CardText" unique_id=1350595381]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.827451, 0.41960785, 1)
+theme_override_colors/font_outline_color = Color(0.08627451, 0.047058824, 0.03137255, 1)
+theme_override_font_sizes/font_size = 28
+text = "Power Shot"
+horizontal_alignment = 1
+
+[node name="UpgradeDescription" type="Label" parent="CardText" unique_id=1265812302]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9098039, 0.8627451, 0.78431374, 1)
+text = "+2 Projectile Damage"
+horizontal_alignment = 1
+autowrap_mode = 3

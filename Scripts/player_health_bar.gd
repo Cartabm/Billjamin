@@ -7,6 +7,7 @@ extends Control
 @onready var curved_hp_text: Control = $CurvedHPText
 @onready var xp_fill: TextureRect = $XPFill
 @onready var level_label: Label = $LevelLabel
+@onready var dodge_cooldown_bar: ProgressBar = $DodgeCooldownBar
 
 var displayed_xp_percent: float = 0.0
 var xp_tween: Tween
@@ -110,3 +111,12 @@ func _update_xp_shader(percent: float) -> void:
 func set_player_level(level: int) -> void:
 	if is_instance_valid(level_label):
 		level_label.text = str(level)
+
+func set_dodge_energy(current_energy: float, maximum_energy: float) -> void:
+	if not is_instance_valid(dodge_cooldown_bar):
+		return
+
+	dodge_cooldown_bar.value = (
+		clampf(current_energy / maxf(maximum_energy, 1.0), 0.0, 1.0)
+		* 100.0
+	)

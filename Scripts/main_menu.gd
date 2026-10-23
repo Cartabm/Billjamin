@@ -25,7 +25,6 @@ func _ready() -> void:
 	quit_button.pressed.connect(_on_quit_pressed)
 	PlayerService.save_loaded.connect(_on_cloud_save_loaded)
 
-
 	PlayerService.session_restored.connect(_on_session_restored)
 	PlayerService.profile_loaded.connect(_on_profile_loaded)
 
@@ -43,7 +42,7 @@ func _exit_tree() -> void:
 
 	if PlayerService.profile_loaded.is_connected(_on_profile_loaded):
 		PlayerService.profile_loaded.disconnect(_on_profile_loaded)
-		
+
 	if PlayerService.save_loaded.is_connected(_on_cloud_save_loaded):
 		PlayerService.save_loaded.disconnect(_on_cloud_save_loaded)
 
@@ -116,6 +115,7 @@ func _on_cloud_save_loaded(success: bool, message: String) -> void:
 		return
 
 	cloud_save_loaded = true
+
 	get_tree().change_scene_to_file("res://Scenes/CharacterSelect.tscn")
 
 
@@ -126,4 +126,4 @@ func _on_quit_pressed() -> void:
 
 func _on_options_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/optionsmenu.tscn")
-	
+

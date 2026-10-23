@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://jcsdofhlbu2y"]
+
+[ext_resource type="Texture2D" uid="uid://dtpi1gk6df5tf" path="res://Scenes/Dungeons/Art/Walls/StoneWall_PixelTile_256.png" id="1_o1kpe"]
+
+[resource]
+albedo_color = Color(0.6901961, 0.6901961, 0.6901961, 1)
+albedo_texture = ExtResource("1_o1kpe")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 0

@@ -1,4 +1,3 @@
-
 extends RefCounted
 class_name PlayerSave
 
@@ -12,8 +11,6 @@ var total_wins: int = 0
 var currency: int = 0
 
 var unlocked_items: Array[String] = []
-var inventory: Array[Dictionary] = []
-var equipped_items: Dictionary = {}
 var unlocked_upgrades: Array[String] = []
 
 
@@ -26,8 +23,6 @@ func to_dictionary() -> Dictionary:
 		"total_wins": total_wins,
 		"currency": currency,
 		"unlocked_items": unlocked_items,
-		"inventory": inventory,
-		"equipped_items": equipped_items,
 		"unlocked_upgrades": unlocked_upgrades
 	}
 
@@ -44,12 +39,6 @@ func load_from_dictionary(data: Dictionary) -> void:
 	for item in data.get("unlocked_items", []):
 		unlocked_items.append(str(item))
 
-	inventory.clear()
-	for item in data.get("inventory", []):
-		if item is Dictionary:
-			inventory.append(item.duplicate(true))
-
-	equipped_items = data.get("equipped_items", {}).duplicate(true)
 	unlocked_upgrades.clear()
 	for upgrade in data.get("unlocked_upgrades", []):
 		unlocked_upgrades.append(str(upgrade))

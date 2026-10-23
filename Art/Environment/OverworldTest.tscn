@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://cln7apg44rp0v"]
 
 [ext_resource type="Script" uid="uid://dymj8tsc3w1ly" path="res://Scripts/test_camera.gd" id="1_gm64m"]
+[ext_resource type="Script" uid="uid://bwbt6irhwpi0q" path="res://Art/Environment/overworld.gd" id="1_lx0jm"]
 [ext_resource type="Script" uid="uid://dne0cpkv148ms" path="res://Art/Environment/rogue_shared_systems.gd" id="2_gnfiw"]
 [ext_resource type="PackedScene" uid="uid://brbdnyiopa66g" path="res://Art/Characters/Rogue.gltf" id="3_dyawp"]
 [ext_resource type="Material" uid="uid://wysm7ic4osew" path="res://Art/Characters/Materials/Rogue_Texture.tres" id="4_r4q0l"]
@@ -13,8 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://ch003kswtqexp" path="res://Art/Environment/Props/Tree_Oak.tscn" id="12_dyawp"]
 [ext_resource type="Script" uid="uid://bas7k4f6vvcoh" path="res://Art/Environment/overworld_generator.gd" id="12_ntlc7"]
 [ext_resource type="PackedScene" uid="uid://du8c5vqon4aqx" path="res://Art/Environment/Props/House_Small.tscn" id="13_dyawp"]
-[ext_resource type="Script" uid="uid://xv7qdyydn8ko" path="res://Scripts/enemy_spawner_RANGED.gd" id="14_r4q0l"]
+[ext_resource type="Script" uid="uid://bsobtl6g4o1mp" path="res://Scripts/enemy_spawner_overworld_balance.gd" id="14_lx0jm"]
 [ext_resource type="PackedScene" uid="uid://bg6eaj5wkjbx0" path="res://Scenes/enemy_charger.tscn" id="15_41tqv"]
+[ext_resource type="Resource" uid="uid://bj7hfd5yh2631" path="res://Balance/OverworldBalance.tres" id="15_sclvp"]
 [ext_resource type="PackedScene" uid="uid://dj86n2ifo4rmb" path="res://Scenes/enemy_stalker.tscn" id="16_gnfiw"]
 [ext_resource type="PackedScene" uid="uid://m8j8e8kv0mgl" path="res://Scenes/enemy_brute.tscn" id="17_lx0jm"]
 [ext_resource type="PackedScene" uid="uid://05cnluvyrarn" path="res://Scenes/Boss.tscn" id="18_sclvp"]
@@ -62,6 +64,7 @@ height = 0.1
 radial_segments = 32
 
 [node name="OverworldTest" type="Node3D" unique_id=1556720121]
+script = ExtResource("1_lx0jm")
 
 [node name="Enviroment" type="Node3D" parent="." unique_id=1252198242]
 
@@ -103,7 +106,7 @@ texture_filter = 0
 [node name="CharacterModel" parent="TestPlayer" unique_id=96864854 instance=ExtResource("3_dyawp")]
 transform = Transform3D(0.528, 0, 0, 0, 0.528, 0, 0, 0, 0.528, 0, 0, 0)
 
-[node name="Skeleton3D" parent="TestPlayer/CharacterModel/CharacterArmature" parent_id_path=PackedInt32Array(96864854, 984399885) index="0" unique_id=1032989003]
+[node name="Skeleton3D" parent="TestPlayer/CharacterModel/CharacterArmature" parent_id_path=PackedInt32Array(96864854, 413046119) index="0" unique_id=291893976]
 bones/1/position = Vector3(0.05716157, 0.024662921, -0.3462345)
 bones/1/rotation = Quaternion(0.46121296, 0.53512555, 0.5414252, -0.45583114)
 bones/2/position = Vector3(0.0021529722, 1.0306467, 0.18307199)
@@ -144,25 +147,25 @@ bones/30/rotation = Quaternion(0.26499224, 0.65233546, 0.6600286, -0.26191595)
 bones/31/position = Vector3(0.064815134, 0.3428022, 0.59965044)
 bones/31/rotation = Quaternion(-3.552734e-15, -5.9604645e-07, 3.3881257e-21, 1)
 
-[node name="Foot_L" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="0" unique_id=2048585894]
+[node name="Foot_L" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="0" unique_id=334642101]
 transform = Transform3D(-0.15900064, 0.9872109, 0.011570875, 1.6777947e-05, -0.011717194, 0.9999314, 0.9872783, 0.15899001, 0.001846487, 0.055849936, 0.022247527, -0.34634918)
 
-[node name="Head" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="1" unique_id=1660787148]
+[node name="Head" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="1" unique_id=1564327560]
 transform = Transform3D(0.9983021, -0.056769326, 0.013051748, 0.057980508, 0.98995554, -0.12894285, -0.005600512, 0.12948069, 0.9915662, -0.061550096, 2.0149138, 0.18487146)
 
-[node name="LowerArm_L" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="2" unique_id=1013976284]
+[node name="LowerArm_L" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="2" unique_id=1701103865]
 transform = Transform3D(0.5382457, 0.27975437, 0.7950025, 0.26804128, -0.95114416, 0.15322593, 0.7990278, 0.13062021, -0.5869351, 0.3144985, 1.4300278, -0.1795339)
 
-[node name="Weapon_R" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="3" unique_id=250501474]
+[node name="Weapon_R" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="3" unique_id=462649173]
 transform = Transform3D(-0.75379944, 0.53721124, -0.37840545, -0.5834205, -0.2822004, 0.7615667, 0.30233565, 0.7948375, 0.52614254, -0.24231389, 1.4082835, 1.0857507)
 
-[node name="Abdomen" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="4" unique_id=200503781]
+[node name="Abdomen" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="4" unique_id=871505687]
 transform = Transform3D(0.8506215, 0.12362325, 0.51103866, 2.1979213e-07, 0.9719653, -0.23512441, -0.52577853, 0.20000203, 0.82677454, -0.11716806, 1.1311243, 0.06606381)
 
-[node name="Foot_R" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="5" unique_id=1116501119]
+[node name="Foot_R" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="5" unique_id=2046975380]
 transform = Transform3D(-0.7223581, 0.6914722, 0.0080908, -1.6320255e-05, -0.011717041, 0.9999316, 0.69151926, 0.72230846, 0.008475122, -0.27907145, 0.02224748, 0.32660782)
 
-[node name="Rogue" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="6" unique_id=1013935423]
+[node name="Rogue" parent="TestPlayer/CharacterModel/CharacterArmature/Skeleton3D" index="6" unique_id=90753551]
 mesh = SubResource("ArrayMesh_uvecc")
 
 [node name="GroundShadow" type="MeshInstance3D" parent="TestPlayer" unique_id=309223389]
@@ -174,6 +177,9 @@ mesh = SubResource("CylinderMesh_m4any")
 [node name="MeleeTelegraph" parent="TestPlayer" unique_id=930625910 instance=ExtResource("5_q17ol")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
 visible = false
+
+[node name="PlayerSpawnPoint" type="Marker3D" parent="." unique_id=2084428324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 
 [node name="HordeManager" type="Node3D" parent="." unique_id=311074962]
 script = ExtResource("6_2q3su")
@@ -190,7 +196,8 @@ oak_tree_scene = ExtResource("12_dyawp")
 house_scene = ExtResource("13_dyawp")
 
 [node name="EnemySpawner" type="Node3D" parent="." unique_id=1469965657]
-script = ExtResource("14_r4q0l")
+script = ExtResource("14_lx0jm")
+balance_profile = ExtResource("15_sclvp")
 enemy_scene = ExtResource("7_iakfm")
 charger_scene = ExtResource("15_41tqv")
 stalker_scene = ExtResource("16_gnfiw")

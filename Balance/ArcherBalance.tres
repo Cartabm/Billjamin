@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CharacterBalance" format=3 uid="uid://d3g47pgci456x"]
+
+[ext_resource type="Script" uid="uid://ctm1p82ahfkc6" path="res://Scripts/CharacterBalance.gd" id="1_balance"]
+
+[resource]
+script = ExtResource("1_balance")
+character_label = "Archer"
+acceleration = 0.0
+dodge_visual_spin = true
+attack_range = 7.0
+submit_leaderboard_on_death = true

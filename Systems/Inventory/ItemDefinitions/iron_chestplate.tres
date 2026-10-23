@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://di6j6ydar6p0c"]
+
+[ext_resource type="Texture2D" uid="uid://cpc6avpbpov2x" path="res://Assets/Items/Icons/iron_chestplate.jpg" id="1_hjea0"]
+[ext_resource type="Script" uid="uid://76lvttn0yx3e" path="res://Systems/Inventory/ItemDefinition.gd" id="1_i1mrf"]
+
+[resource]
+script = ExtResource("1_i1mrf")
+item_id = "iron_chestplate"
+item_name = "Iron Chestplate"
+grid_width = 2
+grid_height = 3
+item_icon = ExtResource("1_hjea0")
+metadata/_custom_type_script = "uid://76lvttn0yx3e"

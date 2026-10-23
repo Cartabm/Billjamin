@@ -1,16 +1,67 @@
 [gd_scene format=3 uid="uid://duoqukogwl8ob"]
 
+[ext_resource type="Script" uid="uid://c6dnrl184wfvg" path="res://Scenes/town.gd" id="1_1msbo"]
 [ext_resource type="Texture2D" uid="uid://41y5bsggoxa3" path="res://Assets/KennyRetroFantasy/Textures/planks.png" id="1_63qkx"]
-[ext_resource type="Texture2D" uid="uid://dq8x2loxxk1k8" path="res://Assets/KennyRetroFantasy/Textures/water.png" id="2_crgjs"]
-[ext_resource type="Texture2D" uid="uid://cu6gwnslyyemv" path="res://Assets/KennyRetroFantasy/Textures/cobblestone.png" id="3_24t42"]
+[ext_resource type="Texture2D" uid="uid://yt38kiyqd33d" path="res://Art/UI/Waystone/Gothic Fantasy Gemstone UI Frame.png" id="4_857jd"]
 [ext_resource type="PackedScene" uid="uid://dyfv5ysxlde2i" path="res://Scenes/TownCamera.tscn" id="5_24t42"]
+[ext_resource type="Texture2D" uid="uid://8hpfbp38ofn6" path="res://Art/UI/Waystone/Waystone_Destination_Row_Trimmed.png" id="5_e8mj4"]
 [ext_resource type="Script" uid="uid://b0enufqlie0l0" path="res://Scripts/start_portal.gd" id="6_4kemo"]
+[ext_resource type="Texture2D" uid="uid://cynnrp8i5hsi" path="res://Art/Environment/Floors/Moody Forest Floor Texture.png" id="7_3y6l4"]
 [ext_resource type="Script" uid="uid://bxxu2cv7si5x3" path="res://Scripts/portal_ui.gd" id="7_psqf8"]
 [ext_resource type="Script" uid="uid://c283vxhtw4odl" path="res://Scripts/leaderboard_ui.gd" id="8_11y0e"]
 [ext_resource type="Script" uid="uid://d0rmiagcyxrk4" path="res://Scripts/leaderboard_board.gd" id="8_c0ied"]
 [ext_resource type="Script" uid="uid://dgvsra5vddh5" path="res://Scripts/townpausemenu.gd" id="10_ios02"]
 [ext_resource type="Script" uid="uid://xs7t0wd1uu5f" path="res://Scripts/dungeon_entrance.gd" id="11_n4wug"]
 [ext_resource type="Script" uid="uid://bcw25ol1phsxt" path="res://Scripts/player_spawner.gd" id="12_2hxns"]
+[ext_resource type="PackedScene" uid="uid://ccana8j5bbk36" path="res://Scenes/CharacterInventory.tscn" id="13_b0ayn"]
+[ext_resource type="Script" uid="uid://j3dboi8gqcsa" path="res://Scenes/ground_items_manager.gd" id="14_d41cr"]
+[ext_resource type="Texture2D" uid="uid://ckgqapg5ep8ts" path="res://Art/Environment/Floors/Seamless Pixel Art Dungeon Cobblestone.png" id="15_5cbxa"]
+[ext_resource type="Script" uid="uid://bdqbjfvr6e4rg" path="res://Scenes/Waypoint.gd" id="16_3y6l4"]
+[ext_resource type="Texture2D" uid="uid://crxuqp0wbyyml" path="res://Art/Environment/Walls/Infernal Citadel Under a Crimson Vortex.png" id="17_857jd"]
+[ext_resource type="Shader" uid="uid://dueo324fcwbpj" path="res://Scenes/Town.gdshader" id="17_c4gno"]
+[ext_resource type="PackedScene" uid="uid://dpbb55qh3x550" path="res://BrokenUpgradeAltar.tscn" id="19_3lfj8"]
+[ext_resource type="PackedScene" uid="uid://doqekn0dcheyx" path="res://Assets/UI/UpgradeTreePreview.tscn" id="20_5qjph"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3y6l4"]
+content_margin_left = 75.0
+content_margin_top = 100.0
+content_margin_right = 75.0
+content_margin_bottom = 75.0
+texture = ExtResource("4_857jd")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_857jd"]
+content_margin_left = 105.0
+content_margin_top = 0.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+texture = ExtResource("5_e8mj4")
+texture_margin_left = 15.0
+texture_margin_top = 5.0
+texture_margin_right = 15.0
+texture_margin_bottom = 5.0
+expand_margin_left = 10.0
+expand_margin_top = 10.0
+expand_margin_right = 10.0
+expand_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_c4gno"]
+content_margin_left = 105.0
+content_margin_top = 0.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+texture = ExtResource("5_e8mj4")
+texture_margin_left = 30.0
+texture_margin_top = 12.0
+texture_margin_right = 30.0
+texture_margin_bottom = 12.0
+expand_margin_left = 10.0
+expand_margin_top = 10.0
+expand_margin_right = 10.0
+expand_margin_bottom = 10.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_n7y2e"]
 size = Vector3(1.5, 2, 0.2)
@@ -33,12 +84,10 @@ uv1_triplanar = true
 material = SubResource("StandardMaterial3D_bxpib")
 size = Vector3(80, 0.2, 80)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nihrx"]
-albedo_texture = ExtResource("2_crgjs")
-
-[sub_resource type="BoxMesh" id="BoxMesh_aesqo"]
-material = SubResource("StandardMaterial3D_nihrx")
-size = Vector3(5, 0.2, 5)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bbl5o"]
+albedo_color = Color(0.34509805, 0.4627451, 0.2901961, 1)
+albedo_texture = ExtResource("7_3y6l4")
+uv1_scale = Vector3(20, 20, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jni1y"]
 albedo_color = Color(0, 0, 0, 1)
@@ -46,18 +95,6 @@ albedo_color = Color(0, 0, 0, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_prtu8"]
 material = SubResource("StandardMaterial3D_jni1y")
 size = Vector3(5, 3.5, 5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_jni1y"]
-size = Vector3(5.6, 0.4, 0.4)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n7y2e"]
-albedo_texture = ExtResource("3_24t42")
-albedo_texture_force_srgb = true
-uv1_triplanar = true
-
-[sub_resource type="BoxMesh" id="BoxMesh_oomdq"]
-material = SubResource("StandardMaterial3D_n7y2e")
-size = Vector3(5.6, 0.4, 0.4)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ek0cf"]
 radius = 2.0
@@ -97,13 +134,87 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="BoxMesh" id="BoxMesh_hieja"]
+size = Vector3(20, 0.1, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_umb2s"]
+albedo_color = Color(0.5372549, 0.5294118, 0.49411765, 1)
+albedo_texture = ExtResource("15_5cbxa")
+uv1_scale = Vector3(10, 10, 1)
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_umb2s"]
+size = Vector3(4, 0.1, 15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ptp84"]
+size = Vector3(10, 0.1, 4)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_prtu8"]
+radius = 3.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_oomdq"]
+top_radius = 2.0
+bottom_radius = 2.0
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_857jd"]
+albedo_color = Color(0.14509805, 0.6392157, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ao8as"]
+size = Vector3(80, 2, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ao8as"]
+size = Vector3(80, 2, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x6v35"]
+albedo_texture = ExtResource("15_5cbxa")
+uv1_scale = Vector3(80, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gdydc"]
+size = Vector3(80, 2, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3y6l4"]
+albedo_texture = ExtResource("15_5cbxa")
+uv1_scale = Vector3(80, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kd17e"]
+albedo_texture = ExtResource("15_5cbxa")
+uv1_scale = Vector3(80, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_we2ii"]
+albedo_texture = ExtResource("15_5cbxa")
+uv1_scale = Vector3(80, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ek0cf"]
+top_radius = 140.0
+bottom_radius = 140.0
+height = 160.0
+radial_segments = 128
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_857jd"]
+render_priority = 0
+shader = ExtResource("17_c4gno")
+shader_parameter/backdrop_texture = ExtResource("17_857jd")
+shader_parameter/fade_start = 0.15
+shader_parameter/fade_end = 0.4
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ek0cf"]
+size = Vector2(280, 280)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_prtu8"]
+albedo_texture = ExtResource("7_3y6l4")
+uv1_scale = Vector3(20, 20, 1)
+
 [node name="Town" type="Node3D" unique_id=118958257]
+script = ExtResource("1_1msbo")
 
 [node name="PlayerSpawner" type="Node3D" parent="." unique_id=824295985]
 script = ExtResource("12_2hxns")
 
 [node name="PlayerSpawnPoint" type="Marker3D" parent="PlayerSpawner" unique_id=507322]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 5.824)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 23.014606)
 
 [node name="PortalUI" type="CanvasLayer" parent="." unique_id=146032080]
 script = ExtResource("7_psqf8")
@@ -111,66 +222,113 @@ script = ExtResource("7_psqf8")
 [node name="PortalPrompt" type="Control" parent="PortalUI" unique_id=313903760]
 visible = false
 layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PortalUI/PortalPrompt" unique_id=1884103352]
+texture_filter = 1
+custom_minimum_size = Vector2(520, 620)
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -960.0
+offset_top = -540.0
+offset_right = -440.0
+offset_bottom = 80.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="PortalUI/PortalPrompt" unique_id=1884103352]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_3y6l4")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PortalUI/PortalPrompt/PanelContainer" unique_id=411291057]
+custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 
-[node name="PromptLabel" type="Label" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1370973226]
+[node name="WaystoneTitle" type="Label" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1370973226]
 layout_mode = 2
-text = "Ready to begin?"
+text = "THE WAYSTONE NETWORK"
+horizontal_alignment = 1
 
-[node name="YesButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1231951593]
+[node name="ProvingGroundsButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1231951593]
+texture_filter = 1
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-text = "Yes"
+theme_override_colors/font_color = Color(0.8509804, 0.8156863, 0.7372549, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0.8352941, 0.6039216, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_857jd")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4gno")
+theme_override_styles/hover = SubResource("StyleBoxTexture_c4gno")
+text = "The Proving Grounds"
+alignment = 0
 
-[node name="NoButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1974384528]
+[node name="CrucibleButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=141362966]
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-text = "No
-"
+theme_override_colors/font_color = Color(0.8509804, 0.8156863, 0.7372549, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0.8352941, 0.6039216, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_857jd")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4gno")
+theme_override_styles/hover = SubResource("StyleBoxTexture_c4gno")
+text = "The Crucible"
+alignment = 0
 
-[node name="ArenaButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=141362966]
+[node name="WildsButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1030449703]
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-text = "To the Arena"
+theme_override_colors/font_color = Color(0.8509804, 0.8156863, 0.7372549, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0.8352941, 0.6039216, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_857jd")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4gno")
+theme_override_styles/hover = SubResource("StyleBoxTexture_c4gno")
+text = "The Wilds"
+alignment = 0
 
-[node name="OverworldButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1030449703]
+[node name="DepthsButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=757513648]
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-text = "Go to new content?
-			Yes"
+theme_override_colors/font_color = Color(0.8509804, 0.8156863, 0.7372549, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0.8352941, 0.6039216, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_857jd")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4gno")
+theme_override_styles/hover = SubResource("StyleBoxTexture_c4gno")
+text = "The Depths"
+alignment = 0
+
+[node name="ReturnButton" type="Button" parent="PortalUI/PortalPrompt/PanelContainer/VBoxContainer" unique_id=1974384528]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_857jd")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4gno")
+theme_override_styles/hover = SubResource("StyleBoxTexture_c4gno")
+text = "Return"
+alignment = 0
 
 [node name="DungeonEntrance" type="StaticBody3D" parent="." unique_id=1665572306]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.267618, 0)
+visible = false
 script = ExtResource("11_n4wug")
 dungeon_scene_path = "uid://dstk74csou7m"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DungeonEntrance" unique_id=364295158]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.1556015, 1, 0)
+visible = false
 mesh = SubResource("BoxMesh_n7y2e")
 
-[node name="Label" type="Label" parent="DungeonEntrance/MeshInstance3D" unique_id=92667159]
-offset_top = 5.0
-offset_right = 130.0
-offset_bottom = 29.0
-text = "CLICK E ON ME"
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DungeonEntrance" unique_id=1442497620]
+visible = false
 shape = SubResource("BoxShape3D_prtu8")
 
 [node name="InteractionArea" type="Area3D" parent="DungeonEntrance" unique_id=1216074836]
+visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DungeonEntrance/InteractionArea" unique_id=1384864598]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.131125, 0, -0.03155887)
@@ -179,65 +337,55 @@ shape = SubResource("SphereShape3D_ap0u0")
 [node name="GroundBody" type="StaticBody3D" parent="." unique_id=549919768]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=308670572]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 shape = SubResource("BoxShape3D_ap0u0")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1300252191]
-transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
 mesh = SubResource("BoxMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_bbl5o")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=751624136]
-transform = Transform3D(0.8660254, 0.35355338, -0.35355338, 0, 0.70710677, 0.70710677, 0.5, -0.6123724, 0.6123724, 0, 0, 0)
-
-[node name="Plaza" type="MeshInstance3D" parent="." unique_id=1148042828]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-mesh = SubResource("BoxMesh_aesqo")
+transform = Transform3D(0.81915206, 0.4055798, -0.4055798, 0, 0.70710677, 0.70710677, 0.57357645, -0.579228, 0.579228, 0, 20, 0)
+light_energy = 1.2
+shadow_enabled = true
 
 [node name="BlacksmithPlaceholder" type="MeshInstance3D" parent="." unique_id=323503541]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 2, 0)
 mesh = SubResource("BoxMesh_prtu8")
 
 [node name="UpgradeShopPlaceholder" type="MeshInstance3D" parent="." unique_id=1233725619]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.75, 0)
+visible = false
 mesh = SubResource("BoxMesh_prtu8")
 
-[node name="PondBorder_North" type="MeshInstance3D" parent="." unique_id=914267216]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -2.7)
-mesh = SubResource("BoxMesh_jni1y")
-
-[node name="PondBorder_South" type="MeshInstance3D" parent="." unique_id=366955198]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 2.7)
-mesh = SubResource("BoxMesh_oomdq")
-
-[node name="PondBorder_East" type="MeshInstance3D" parent="." unique_id=964096244]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.7, 0.2, 0)
-mesh = SubResource("BoxMesh_jni1y")
-
-[node name="PondBorder_West" type="MeshInstance3D" parent="." unique_id=286336672]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.7, 0.2, 0)
-mesh = SubResource("BoxMesh_jni1y")
-
 [node name="TownCamera" parent="." unique_id=1100074316 instance=ExtResource("5_24t42")]
+transform = Transform3D(1, 8.8491914e-10, -4.321699e-10, -3.201421e-10, 0.7071069, 0.70710677, 9.3132246e-10, -0.70710677, 0.7071069, 0, 21.3511, 26.344759)
 
 [node name="StartPortal" type="Area3D" parent="." unique_id=162100035]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1.5, -6)
+visible = false
 script = ExtResource("6_4kemo")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StartPortal" unique_id=1269131482]
+visible = false
 shape = SubResource("SphereShape3D_ek0cf")
 
 [node name="PortalVisual" type="MeshInstance3D" parent="StartPortal" unique_id=522538880]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05370897, -0.01718998, -0.49759185)
+visible = false
 mesh = SubResource("TorusMesh_ek0cf")
 
 [node name="InteractLabel" type="Label3D" parent="StartPortal" unique_id=83001685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
 billboard = 1
 text = "Interact with E"
 font_size = 48
 outline_size = 8
 
 [node name="LeaderboardBoard" type="StaticBody3D" parent="." unique_id=2094979155]
+transform = Transform3D(0.76257396, 0, 0.64690095, 0, 1, 0, -0.64690095, 0, 0.76257396, -10.315239, 0, -10.49499)
 script = ExtResource("8_c0ied")
 
 [node name="BoardVisual" type="MeshInstance3D" parent="LeaderboardBoard" unique_id=49864704]
@@ -249,6 +397,16 @@ mesh = SubResource("BoxMesh_ap0u0")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="LeaderboardBoard/InteractionArea" unique_id=5440877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012433529, -0.010839701, -0.016833067)
 shape = SubResource("BoxShape3D_ek0cf")
+
+[node name="Label" type="Label3D" parent="LeaderboardBoard" unique_id=332247086]
+transform = Transform3D(1, 0, 2.9802322e-08, 0, 1, 0, -2.9802322e-08, 0, 1, -4.7683716e-07, 3.8776367, 0.29999924)
+text = "Leaderboard
+temp(prob a forever
+because ill never
+get around to
+adding something
+to replace this
+damn placeholder."
 
 [node name="LeaderboardUI" type="CanvasLayer" parent="." unique_id=794687375]
 script = ExtResource("8_11y0e")
@@ -385,16 +543,15 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -70.5
-offset_top = -49.0
-offset_right = 70.5
+offset_left = -87.0
+offset_top = -50.0
+offset_right = 87.0
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="PromptLabel" type="Label" parent="LeaderboardUI/InteractionPrompt" unique_id=611109352]
 layout_mode = 2
-text = "[E]
-View Hall of Cucks"
+text = "[E] View Leaderboard"
 horizontal_alignment = 1
 
 [node name="TownPauseMenu" type="CanvasLayer" parent="." unique_id=999087164]
@@ -435,5 +592,113 @@ text = "Main Menu"
 [node name="QuitButton" type="Button" parent="TownPauseMenu/PauseMenu/CenterContainer/CenterVBox" unique_id=972438662]
 layout_mode = 2
 text = "Quit dogshit game"
+
+[node name="CharacterInventory" parent="." unique_id=1735456495 instance=ExtResource("13_b0ayn")]
+offset_left = 1.0
+offset_top = 3.0
+offset_right = 1.0
+offset_bottom = 3.0
+
+[node name="GroundItems" type="Node3D" parent="." unique_id=120790861]
+script = ExtResource("14_d41cr")
+
+[node name="TownSquareFloor" type="MeshInstance3D" parent="." unique_id=1331515701]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("BoxMesh_hieja")
+surface_material_override/0 = SubResource("StandardMaterial3D_umb2s")
+
+[node name="TownPath_North" type="MeshInstance3D" parent="." unique_id=441877827]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -17.5)
+mesh = SubResource("BoxMesh_umb2s")
+surface_material_override/0 = SubResource("StandardMaterial3D_umb2s")
+
+[node name="TownPath_South" type="MeshInstance3D" parent="." unique_id=1127224940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 17.5)
+mesh = SubResource("BoxMesh_umb2s")
+surface_material_override/0 = SubResource("StandardMaterial3D_umb2s")
+
+[node name="TownPath_West" type="MeshInstance3D" parent="." unique_id=837337319]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.05, 0)
+mesh = SubResource("BoxMesh_ptp84")
+surface_material_override/0 = SubResource("StandardMaterial3D_umb2s")
+
+[node name="TownPath_East" type="MeshInstance3D" parent="." unique_id=510057650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.05, 0)
+mesh = SubResource("BoxMesh_ptp84")
+surface_material_override/0 = SubResource("StandardMaterial3D_umb2s")
+
+[node name="Waypoint" type="Area3D" parent="." unique_id=1151366331]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+script = ExtResource("16_3y6l4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Waypoint" unique_id=2003148548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_prtu8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Waypoint" unique_id=328727279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("CylinderMesh_oomdq")
+surface_material_override/0 = SubResource("StandardMaterial3D_857jd")
+
+[node name="InteractLabel" type="Label3D" parent="Waypoint" unique_id=2045479417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+billboard = 1
+text = "Press E - Waypoint"
+
+[node name="TownWall_North" type="StaticBody3D" parent="." unique_id=1004808357]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -40)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TownWall_North" unique_id=1220069264]
+shape = SubResource("BoxShape3D_ao8as")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TownWall_North" unique_id=1741822282]
+mesh = SubResource("BoxMesh_ao8as")
+surface_material_override/0 = SubResource("StandardMaterial3D_x6v35")
+
+[node name="TownWall_South" type="StaticBody3D" parent="." unique_id=1805239829]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 40)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TownWall_South" unique_id=1238406486]
+mesh = SubResource("BoxMesh_gdydc")
+surface_material_override/0 = SubResource("StandardMaterial3D_3y6l4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TownWall_South" unique_id=1124592719]
+shape = SubResource("BoxShape3D_ao8as")
+
+[node name="TownWall_East" type="StaticBody3D" parent="." unique_id=443551053]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 40, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TownWall_East" unique_id=1951201485]
+mesh = SubResource("BoxMesh_gdydc")
+surface_material_override/0 = SubResource("StandardMaterial3D_kd17e")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TownWall_East" unique_id=1323753080]
+shape = SubResource("BoxShape3D_ao8as")
+
+[node name="TownWall_West" type="StaticBody3D" parent="." unique_id=2139101813]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -40, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TownWall_West" unique_id=1567475401]
+mesh = SubResource("BoxMesh_gdydc")
+surface_material_override/0 = SubResource("StandardMaterial3D_we2ii")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TownWall_West" unique_id=1294354222]
+shape = SubResource("BoxShape3D_ao8as")
+
+[node name="WorldBackdrop" type="MeshInstance3D" parent="." unique_id=1719847489]
+transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0, 71.48673, 0)
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_ek0cf")
+surface_material_override/0 = SubResource("ShaderMaterial_857jd")
+
+[node name="DistantTerrain" type="MeshInstance3D" parent="." unique_id=204210725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0989151, -0.22706318, 0.010372162)
+mesh = SubResource("PlaneMesh_ek0cf")
+surface_material_override/0 = SubResource("StandardMaterial3D_prtu8")
+
+[node name="BrokenAltar" parent="." unique_id=895711413 instance=ExtResource("19_3lfj8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.167704, -0.5361762, 0)
+
+[node name="UpgradeTreePreview" parent="." unique_id=1987764157 instance=ExtResource("20_5qjph")]
 
 [connection signal="pressed" from="LeaderboardUI/LeaderboardPanel/OuterFrame/InnerBackground/ContentMargin/MainVBox/CloseButton" to="LeaderboardUI" method="_on_close_button_pressed"]

@@ -17,6 +17,18 @@ func submit_run(
 	time_alive_seconds: int,
 	score: int
 ) -> void:
+	if not PlayerService.is_authenticated:
+		request_failed.emit("Player is not signed in.")
+		return
+
+	if PlayerService.access_token.is_empty():
+		request_failed.emit("Authentication token is missing.")
+		return
+
+	if not CharacterManager.has_selected_character():
+		request_failed.emit("No character selected for leaderboard submission.")
+		return
+
 	var http := HTTPRequest.new()
 	add_child(http)
 
@@ -26,7 +38,7 @@ func submit_run(
 
 	var headers := PackedStringArray([
 		"apikey: " + SUPABASE_KEY,
-		"Authorization: Bearer " + SUPABASE_KEY,
+		"Authorization: Bearer " + PlayerService.access_token,
 		"Content-Type: application/json",
 		"Prefer: return=minimal"
 	])
@@ -36,7 +48,8 @@ func submit_run(
 		"kills": kills,
 		"player_level": player_level,
 		"time_alive_seconds": time_alive_seconds,
-		"score": score
+		"score": score,
+		"character_id": CharacterManager.selected_character_id
 	}
 
 	var error := http.request(
@@ -47,7 +60,9 @@ func submit_run(
 	)
 
 	if error != OK:
-		request_failed.emit("Could not start score submission. Error: %s" % error)
+		request_failed.emit(
+			"Could not start score submission. Error: %s" % error
+		)
 		http.queue_free()
 
 

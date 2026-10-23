@@ -45,10 +45,14 @@ text = "Music Volume"
 layout_mode = 2
 value = 60.0
 
-[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1168313855]
-layout_mode = 2
-text = "Back"
-
 [node name="RotateMinimapCheckButton" type="CheckButton" parent="CenterContainer/VBoxContainer" unique_id=1409869080]
 layout_mode = 2
 text = "Minimap spin?? (no)"
+
+[node name="AutoTargetingCheckButton" type="CheckButton" parent="CenterContainer/VBoxContainer" unique_id=1780988059]
+layout_mode = 2
+text = "Auto Target"
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1168313855]
+layout_mode = 2
+text = "Back"

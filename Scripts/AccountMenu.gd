@@ -33,17 +33,7 @@ func _exit_tree() -> void:
 
 
 func _on_create_account_pressed() -> void:
-	var email := email_input.text.strip_edges()
-	var password := password_input.text
-
-	if email.is_empty() or password.is_empty():
-		status_label.text = "Enter your email and password."
-		return
-
-	_set_form_enabled(false)
-	status_label.text = "Creating account..."
-
-	PlayerService.create_account(email, password)
+	get_tree().change_scene_to_file("res://Scenes/Account/CreateAccount.tscn")
 
 
 func _on_sign_in_pressed() -> void:

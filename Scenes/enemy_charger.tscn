@@ -175,7 +175,7 @@ animations = [{
 
 [node name="Enemy" type="CharacterBody3D" unique_id=394797931]
 collision_layer = 2
-collision_mask = 0
+collision_mask = 4
 script = ExtResource("1_pn0po")
 enemy_behavior = 1
 contact_damage = 10
@@ -185,10 +185,10 @@ contact_damage_cooldown = 1.0
 transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
 visible = false
 
-[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=1583117048]
+[node name="CharacterArmature" parent="MonsterVisual" index="0" unique_id=165251839]
 visible = false
 
-[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1267743977]
+[node name="Skeleton3D" parent="MonsterVisual/CharacterArmature" index="0" unique_id=1115411950]
 bones/1/position = Vector3(0.3519203, 0.0727973, -0.457257)
 bones/1/rotation = Quaternion(6.1599435e-06, 0.68542606, 0.7281423, 1.4452308e-05)
 bones/2/position = Vector3(0.0034563416, 0.8202857, 0.24707782)
@@ -221,7 +221,7 @@ bones/39/rotation = Quaternion(0.31928724, -0.0043265997, -0.009673393, 0.947598
 bones/41/position = Vector3(-0.34929794, 0.11403547, 0.6262628)
 bones/41/rotation = Quaternion(-1.1940042e-05, 0.8794672, 0.47595972, -1.0840305e-05)
 
-[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=107495399]
+[node name="AnimationPlayer" parent="MonsterVisual" index="1" unique_id=997331775]
 autoplay = &"Walk"
 
 [node name="Orc2" parent="MonsterVisual" unique_id=589551075 instance=ExtResource("3_0v6sl")]

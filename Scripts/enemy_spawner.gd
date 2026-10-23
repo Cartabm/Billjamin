@@ -1,5 +1,12 @@
-
 extends Node3D
+
+@export_group("Centralized Balance")
+@export var balance_profile: EnemyBalanceProfile
+
+# A cap applies only when a balance profile is assigned. Existing scenes
+# without a profile retain their original unlimited-spawning behavior.
+var max_living_enemies: int = -1
+
 
 @export_group("Enemy Spawn Toggles")
 @export var spawn_regular_enemies: bool = true
@@ -71,6 +78,7 @@ var player_travel_direction: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
+	_apply_balance_profile()
 	player = _find_player()
 	current_horde_size = horde_size
 	arena_time_remaining = arena_duration
@@ -220,7 +228,7 @@ func start_boss_fight() -> void:
 			var enemy_script = child.get_script()
 
 			if enemy_script != null:
-				if enemy_script.resource_path.to_lower() == "res://Scripts/enemy.gd":
+				if enemy_script.resource_path.to_lower() == "res://scripts/enemy.gd":
 					child.queue_free()
 
 	update_arena_timer_label()
@@ -246,11 +254,28 @@ func start_boss_fight() -> void:
 
 
 func spawn_horde() -> void:
-	for i in range(current_horde_size):
+	if boss_fight_started:
+		return
+
+	var spawn_count: int = current_horde_size
+
+	# Limit the number of living enemies without altering horde progression.
+	if max_living_enemies >= 0:
+		var free_slots: int = maxi(0, max_living_enemies - _count_living_enemies())
+		spawn_count = mini(spawn_count, free_slots)
+
+	for i in range(spawn_count):
 		if boss_fight_started:
 			return
-
 		spawn_enemy()
+
+
+func _count_living_enemies() -> int:
+	var count: int = 0
+	for enemy in get_tree().get_nodes_in_group("normal_enemy"):
+		if is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
+			count += 1
+	return count
 
 
 func get_arena_size() -> float:
@@ -269,24 +294,12 @@ func spawn_enemy() -> void:
 	if boss_fight_started or player == null:
 		return
 
-	var available_scenes: Array[PackedScene] = []
+	# Also enforce the cap when spawn_enemy() is called directly.
+	if max_living_enemies >= 0 and _count_living_enemies() >= max_living_enemies:
+		return
 
-	if spawn_regular_enemies and enemy_scene != null:
-		available_scenes.append(enemy_scene)
-
-	if spawn_chargers and charger_scene != null:
-		available_scenes.append(charger_scene)
-
-	if spawn_stalkers and stalker_scene != null:
-		available_scenes.append(stalker_scene)
-
-	if spawn_brutes and brute_scene != null:
-		available_scenes.append(brute_scene)
-		
-	if spawn_ranged and ranged_scene != null:
-		available_scenes.append(ranged_scene)
-
-	if available_scenes.is_empty():
+	var chosen_scene: PackedScene = _pick_weighted_enemy_scene()
+	if chosen_scene == null:
 		return
 
 	var spawn_position := Vector3.ZERO
@@ -318,8 +331,10 @@ func spawn_enemy() -> void:
 	if not found_position:
 		return
 
-	var chosen_scene: PackedScene = available_scenes.pick_random()
 	var enemy = chosen_scene.instantiate()
+
+	# Apply enemy stats before add_child(), which triggers enemy._ready().
+	_apply_enemy_balance(enemy)
 
 	if enemy.get("arena_half_size") != null:
 		enemy.set(
@@ -481,3 +496,117 @@ func _teleport_enemy_ahead(enemy: Node3D) -> void:
 
 func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
+
+
+# Read the Arena profile once at startup. Without a profile, keep the
+# spawner's existing Inspector settings and equal-probability selection.
+func _apply_balance_profile() -> void:
+	if balance_profile == null:
+		return
+
+	spawn_interval = maxf(0.01, balance_profile.spawn_interval)
+	horde_size = maxi(0, balance_profile.horde_size)
+	horde_size_increase = maxi(0, balance_profile.horde_size_increase)
+	horde_increase_interval = maxf(0.01, balance_profile.horde_increase_interval)
+	difficulty_interval = maxf(0.01, balance_profile.difficulty_interval)
+	spawn_interval_decrease = maxf(0.0, balance_profile.spawn_interval_decrease)
+	minimum_spawn_interval = maxf(0.01, balance_profile.minimum_spawn_interval)
+	arena_duration = maxf(0.0, balance_profile.arena_duration)
+	max_living_enemies = maxi(0, balance_profile.max_living_enemies)
+
+
+func _pick_weighted_enemy_scene() -> PackedScene:
+	var scenes: Array[PackedScene] = []
+	var weights: Array[int] = []
+
+	# Keep scene toggles and null-scene checks working as before.
+	if spawn_regular_enemies and enemy_scene != null:
+		scenes.append(enemy_scene)
+		weights.append(balance_profile.regular_weight if balance_profile != null else 1)
+	if spawn_chargers and charger_scene != null:
+		scenes.append(charger_scene)
+		weights.append(balance_profile.charger_weight if balance_profile != null else 1)
+	if spawn_stalkers and stalker_scene != null:
+		scenes.append(stalker_scene)
+		weights.append(balance_profile.stalker_weight if balance_profile != null else 1)
+	if spawn_brutes and brute_scene != null:
+		scenes.append(brute_scene)
+		weights.append(balance_profile.brute_weight if balance_profile != null else 1)
+	if spawn_ranged and ranged_scene != null:
+		scenes.append(ranged_scene)
+		weights.append(balance_profile.ranged_weight if balance_profile != null else 1)
+
+	if scenes.is_empty():
+		return null
+
+	var total_weight: int = 0
+	for weight in weights:
+		total_weight += maxi(0, weight)
+
+	# All weights set to zero intentionally disables regular spawning.
+	if total_weight <= 0:
+		return null
+
+	var roll: int = randi_range(1, total_weight)
+	for i in range(scenes.size()):
+		roll -= maxi(0, weights[i])
+		if roll <= 0:
+			return scenes[i]
+
+	return null
+
+
+func _apply_enemy_balance(enemy: Node) -> void:
+	if balance_profile == null:
+		return
+
+	# Elite chance is rolled inside enemy._ready().
+	if _has_property(enemy, "elite_chance"):
+		enemy.set("elite_chance", balance_profile.elite_chance)
+
+	if _has_property(enemy, "max_health"):
+		enemy.set(
+			"max_health",
+			maxi(1, roundi(float(enemy.get("max_health")) * balance_profile.health_multiplier))
+		)
+
+	var damage_properties: Array[String] = [
+		"contact_damage",
+		"charger_punch_damage",
+		"stalker_attack_damage",
+		"brute_attack_damage",
+		"punch_damage",
+		"attack_damage",
+		"ranged_attack_damage"
+	]
+	for property_name in damage_properties:
+		if _has_property(enemy, property_name):
+			enemy.set(
+				property_name,
+				maxi(1, roundi(float(enemy.get(property_name)) * balance_profile.damage_multiplier))
+			)
+
+	if _has_property(enemy, "move_speed"):
+		enemy.set(
+			"move_speed",
+			maxf(0.0, float(enemy.get("move_speed")) * balance_profile.speed_multiplier)
+		)
+
+	var currency_settings: Dictionary = {
+		"currency_drop_chance": balance_profile.gold_drop_chance,
+		"currency_min_drop": balance_profile.gold_minimum,
+		"currency_max_drop": balance_profile.gold_maximum,
+		"elite_currency_drop_chance": balance_profile.elite_gold_drop_chance,
+		"elite_currency_min_drop": balance_profile.elite_gold_minimum,
+		"elite_currency_max_drop": balance_profile.elite_gold_maximum
+	}
+	for property_name in currency_settings:
+		if _has_property(enemy, property_name):
+			enemy.set(property_name, currency_settings[property_name])
+
+
+func _has_property(object: Object, property_name: String) -> bool:
+	for property in object.get_property_list():
+		if property["name"] == property_name:
+			return true
+	return false

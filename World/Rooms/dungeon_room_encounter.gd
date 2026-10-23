@@ -1,3 +1,4 @@
+
 extends Node3D
 
 signal encounter_started
@@ -14,6 +15,23 @@ signal progress_changed(kills: int, required: int)
 
 @export var enemy_spawn_height: float = 0.75
 @export var enemy_scenes: Array[PackedScene] = []
+
+# Centralized balance settings.
+var enemy_spawn_weights: Array[int] = []
+
+var configured_elite_chance: float = 0.08
+var configured_health_multiplier: float = 1.0
+var configured_damage_multiplier: float = 1.0
+var configured_speed_multiplier: float = 1.0
+
+var configured_currency_drop_chance: float = 0.25
+var configured_currency_min_drop: int = 5
+var configured_currency_max_drop: int = 15
+
+var configured_elite_currency_drop_chance: float = 0.75
+var configured_elite_currency_min_drop: int = 15
+var configured_elite_currency_max_drop: int = 35
+
 
 @export_group("Room Difficulty Scaling")
 @export var health_increase_per_room: float = 0.15
@@ -49,14 +67,21 @@ func set_room_difficulty(level: int) -> void:
 	room_difficulty = maxi(level, 1)
 	var extra_rooms: int = room_difficulty - 1
 
-	_health_multiplier = 1.0 + float(extra_rooms) * health_increase_per_room
-	_damage_multiplier = 1.0 + float(extra_rooms) * damage_increase_per_room
+	_health_multiplier = (
+		1.0 + float(extra_rooms) * health_increase_per_room
+	)
+
+	_damage_multiplier = (
+		1.0 + float(extra_rooms) * damage_increase_per_room
+	)
 
 	kills_required = maxi(
 		1,
-		roundi(float(kills_required) * (
-			1.0 + float(extra_rooms) * enemy_count_increase_per_room
-		))
+		roundi(
+			float(kills_required) * (
+				1.0 + float(extra_rooms) * enemy_count_increase_per_room
+			)
+		)
 	)
 
 	if extra_alive_every_rooms > 0:
@@ -101,10 +126,6 @@ func _physics_process(delta: float) -> void:
 	if not encounter_active:
 		return
 
-	for enemy in _living_enemies:
-		if is_instance_valid(enemy) and not enemy.is_queued_for_deletion() and not enemy.is_dying:
-			enemy._horde_step(delta)
-
 	_spawn_timer -= delta
 
 	if _spawn_timer <= 0.0:
@@ -140,11 +161,18 @@ func _spawn_enemies(amount: int) -> void:
 
 
 func _spawn_one() -> void:
-	var scene: PackedScene = enemy_scenes.pick_random()
+	# Select enemy using configured spawn weights.
+	var scene: PackedScene = _pick_enemy_scene()
+
+	if scene == null:
+		return
+
 	var enemy := scene.instantiate() as CharacterBody3D
 
 	if enemy == null:
-		push_error("RoomEncounter: Enemy scene root must be CharacterBody3D.")
+		push_error(
+			"RoomEncounter: Enemy scene root must be CharacterBody3D."
+		)
 		_spawned_count = kills_required
 		return
 
@@ -156,13 +184,51 @@ func _spawn_one() -> void:
 		randf_range(-6.0, 6.0)
 	)
 
-	# Apply room scaling before enemy._ready().
-	if _has_property(enemy, "max_health"):
+	# All enemy settings must be applied before add_child(),
+	# because add_child() triggers the enemy's _ready() function.
+
+	# Configure elite spawn chance.
+	if _has_property(enemy, "elite_chance"):
 		enemy.set(
-			"max_health",
-			maxi(1, roundi(float(enemy.get("max_health")) * _health_multiplier))
+			"elite_chance",
+			configured_elite_chance
 		)
 
+	# Apply base health multiplier AND room difficulty scaling.
+	if _has_property(enemy, "max_health"):
+		var original_health: float = float(
+			enemy.get("max_health")
+		)
+
+		var scaled_health: int = maxi(
+			1,
+			roundi(
+				original_health
+				* configured_health_multiplier
+				* _health_multiplier
+			)
+		)
+
+		enemy.set("max_health", scaled_health)
+
+	# Configure normal and elite currency rewards.
+	var currency_settings: Dictionary = {
+		"currency_drop_chance": configured_currency_drop_chance,
+		"currency_min_drop": configured_currency_min_drop,
+		"currency_max_drop": configured_currency_max_drop,
+		"elite_currency_drop_chance": configured_elite_currency_drop_chance,
+		"elite_currency_min_drop": configured_elite_currency_min_drop,
+		"elite_currency_max_drop": configured_elite_currency_max_drop
+	}
+
+	for property_name in currency_settings:
+		if _has_property(enemy, property_name):
+			enemy.set(
+				property_name,
+				currency_settings[property_name]
+			)
+
+	# Apply base damage multiplier AND room difficulty scaling.
 	var damage_properties: Array[String] = [
 		"contact_damage",
 		"charger_punch_damage",
@@ -175,27 +241,53 @@ func _spawn_one() -> void:
 
 	for property_name in damage_properties:
 		if _has_property(enemy, property_name):
-			enemy.set(
-				property_name,
-				maxi(
-					1,
-					roundi(float(enemy.get(property_name)) * _damage_multiplier)
+			var original_damage: float = float(
+				enemy.get(property_name)
+			)
+
+			var scaled_damage: int = maxi(
+				1,
+				roundi(
+					original_damage
+					* configured_damage_multiplier
+					* _damage_multiplier
 				)
 			)
 
+			enemy.set(property_name, scaled_damage)
+
+
+	# Apply movement speed before the enemy enters the scene.
+	if _has_property(enemy, "move_speed"):
+		var original_speed: float = float(enemy.get("move_speed"))
+
+		enemy.set(
+			"move_speed",
+			maxf(0.0, original_speed * configured_speed_multiplier)
+		)
+
+	# Add enemy to the active scene.
 	get_tree().current_scene.add_child(enemy)
 
-	enemy.global_position = center.global_position + spawn_offset
+	enemy.global_position = (
+		center.global_position + spawn_offset
+	)
+
+	# Connect dungeon kill tracking.
 	enemy.dungeon_enemy_killed.connect(_on_enemy_killed)
 
 	_living_enemies.append(enemy)
 	_spawned_count += 1
 
 
-func _has_property(object: Object, property_name: String) -> bool:
+func _has_property(
+	object: Object,
+	property_name: String
+) -> bool:
 	for property in object.get_property_list():
 		if property["name"] == property_name:
 			return true
+
 	return false
 
 
@@ -212,11 +304,14 @@ func register_kill() -> void:
 		return
 
 	kills_completed += 1
-	progress_changed.emit(kills_completed, kills_required)
+
+	progress_changed.emit(
+		kills_completed,
+		kills_required
+	)
 
 	if kills_completed >= kills_required:
 		complete_encounter()
-
 
 
 func complete_encounter() -> void:
@@ -231,3 +326,30 @@ func complete_encounter() -> void:
 			gate.open_gate()
 
 	encounter_completed.emit()
+
+
+func _pick_enemy_scene() -> PackedScene:
+	if enemy_scenes.is_empty():
+		return null
+
+	# Fall back to equal probabilities if weights are missing.
+	if enemy_spawn_weights.size() != enemy_scenes.size():
+		return enemy_scenes.pick_random()
+
+	var total_weight: int = 0
+
+	for weight in enemy_spawn_weights:
+		total_weight += maxi(0, weight)
+
+	if total_weight <= 0:
+		return null
+
+	var roll: int = randi_range(1, total_weight)
+
+	for i in range(enemy_scenes.size()):
+		roll -= maxi(0, enemy_spawn_weights[i])
+
+		if roll <= 0:
+			return enemy_scenes[i]
+
+	return null

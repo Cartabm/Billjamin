@@ -21,7 +21,6 @@ extends "res://Scripts/player_base.gd"
 @export var health_bar_screen_offset: Vector2 = Vector2(0, 10)
 
 var dodge_timer: float = 0.0
-var dodge_cooldown_timer: float = 0.0
 var is_dodging: bool = false
 var dodge_start_visual_rotation_x: float = 0.0
 var current_animation: StringName = &""
@@ -97,6 +96,7 @@ func _ready() -> void:
 	run_time_seconds = 0.0
 	run_ended = false
 	current_health = max_health
+	dodge_energy = max_dodge_energy
 
 	var sprite_node = get_node_or_null("CharacterSprite")
 	if sprite_node is AnimatedSprite3D:
@@ -198,10 +198,7 @@ func _physics_process(delta: float) -> void:
 	if not run_ended:
 		run_time_seconds += delta
 
-	dodge_cooldown_timer = maxf(
-		0.0,
-		dodge_cooldown_timer - delta
-	)
+
 
 	# Read WASD input.
 	var input_dir := Vector2.ZERO
@@ -236,16 +233,28 @@ func _physics_process(delta: float) -> void:
 	var move_dir := right * input_dir.x + forward * -input_dir.y
 	move_dir = move_dir.normalized()
 
+	# Smoothly face the WASD movement direction (visual only).
+	# Preserve the existing model's forward-axis convention.
+	if move_dir.length_squared() > 0.001:
+		var facing_visual := get_active_visual()
+		if facing_visual != null:
+			var target_yaw := atan2(-move_dir.x, -move_dir.z)
+			facing_visual.rotation.y = lerp_angle(
+				facing_visual.rotation.y,
+				target_yaw,
+				clampf(turn_speed * delta, 0.0, 1.0)
+			)
+
 	# Flip the sprite based on horizontal movement.
 	if character_sprite != null and absf(move_dir.x) > 0.05:
 		character_sprite.flip_h = move_dir.x < 0.0
 
 	# Start a dodge when Space is pressed and cooldown is ready.
 	if (
-		Input.is_action_just_pressed("dodge")
-		and not is_dodging
-		and dodge_cooldown_timer <= 0.0
-	):
+	Input.is_action_just_pressed("dodge")
+	and not is_dodging
+	and try_spend_dodge_energy()
+):
 		if move_dir.length_squared() > 0.001:
 			dodge_direction = move_dir
 		else:
@@ -256,7 +265,6 @@ func _physics_process(delta: float) -> void:
 		is_dodging = true
 		is_invulnerable = true
 		dodge_timer = dodge_duration
-		dodge_cooldown_timer = dodge_cooldown
 
 		if get_active_visual() != null:
 			dodge_start_visual_rotation_x = get_active_visual().rotation.x
@@ -271,7 +279,7 @@ func _physics_process(delta: float) -> void:
 			1.0
 		)
 
-		# Visually tumble the actual Blake model.
+		# Visually tumble the active character model.
 		if get_active_visual() != null:
 			get_active_visual().rotation.x = (
 				dodge_start_visual_rotation_x + progress * TAU
@@ -327,53 +335,32 @@ func _physics_process(delta: float) -> void:
 
 
 
-func _process(_delta: float) -> void:
-	update_fps_display()
-	update_player_health_bar_position()
+func _process(delta: float) -> void:
+	if hurt_cooldown_remaining > 0.0:
+		hurt_cooldown_remaining = maxf(
+			0.0,
+			hurt_cooldown_remaining - delta
+		)
+
+	if not is_dead and not run_ended:
+		dodge_energy = minf(
+			max_dodge_energy,
+			dodge_energy + dodge_energy_regen * delta
+		)
+
+	if is_instance_valid(player_health_bar):
+		if player_health_bar.has_method("set_dodge_energy"):
+			player_health_bar.set_dodge_energy(
+				dodge_energy,
+				max_dodge_energy
+			)
 
 
-
-
-	if camera == null:
-		camera = get_viewport().get_camera_3d()
-		if camera == null:
-			return
-
-	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-	var ray_origin: Vector3 = camera.project_ray_origin(mouse_pos)
-	var ray_direction: Vector3 = camera.project_ray_normal(mouse_pos)
-
-	# Intersect the mouse ray with the horizontal plane at the player's height.
-	if absf(ray_direction.y) < 0.0001:
-		return
-
-	var distance: float = (global_position.y - ray_origin.y) / ray_direction.y
-	if distance < 0.0:
-		return
-
-	var target: Vector3 = ray_origin + ray_direction * distance
-	var direction: Vector3 = target - global_position
-	direction.y = 0.0
-
-	if direction.length_squared() < 0.001:
-		return
-
-	direction = direction.normalized()
-
-	var facing_visual: Node3D = archer_visual if use_archer_animations and archer_visual != null else player_visual
-	if facing_visual != null:
-		if face_camera_direction:
-			var camera_forward: Vector3 = -camera.global_basis.z
-			camera_forward.y = 0.0
-			if camera_forward.length_squared() > 0.0001:
-				camera_forward = camera_forward.normalized()
-				facing_visual.rotation.y = atan2(camera_forward.x, camera_forward.z)
-		else:
-			facing_visual.rotation.y = atan2(-direction.x, -direction.z) + PI
 
 func find_nearest_auto_fire_target() -> Node3D:
 	var nearest_enemy: Node3D = null
-	var nearest_distance_squared: float = Auto_fire_range * Auto_fire_range
+	var effective_range: float = Auto_fire_range * attack_range_multiplier
+	var nearest_distance_squared: float = effective_range * effective_range
 
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if not enemy is Node3D:
@@ -385,9 +372,9 @@ func find_nearest_auto_fire_target() -> Node3D:
 		if enemy.is_queued_for_deletion():
 			continue
 
-		var distance_squared: float = global_position.distance_squared_to(
-			enemy.global_position
-		)
+		var offset: Vector3 = enemy.global_position - global_position
+		offset.y = 0.0
+		var distance_squared: float = offset.length_squared()
 
 		if distance_squared < nearest_distance_squared:
 			nearest_distance_squared = distance_squared
@@ -469,13 +456,16 @@ func shoot_at_position(target: Vector3) -> void:
 
 		if projectile == null:
 			continue
+		var attack_tags: Array[String] = ["ranged", "projectile", "physical"]
+
 		var hit_result: Dictionary = DamageCalculator.calculate_hit(
-			projectile_damage,
+			projectile_damage + get_attack_damage_bonus(attack_tags),
 			critical_hit_chance,
 			critical_damage_multiplier,
 			minimum_damage_multiplier,
 			maximum_damage_multiplier
 		)
+
 
 		var final_damage:int = hit_result["damage"]
 		var is_critical_hit: bool = hit_result["is_critical"]
@@ -557,8 +547,17 @@ func play_archer_action(name: StringName, fallback_duration: float) -> void:
 	archer_action_time = maxf(fallback_duration, archer_animation_player.get_animation(name).length)
 
 func _on_return_to_town_pressed() -> void:
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://Scenes/Town.tscn")
+	var scene_tree := Engine.get_main_loop() as SceneTree
+
+	if scene_tree == null:
+		push_error("Return to Town failed: SceneTree not available.")
+		return
+
+	scene_tree.paused = false
+	scene_tree.call_deferred(
+		"change_scene_to_file",
+		"res://Scenes/Town.tscn"
+	)
 
 
 
@@ -611,8 +610,18 @@ func show_game_over() -> void:
 
 
 func _on_restart_pressed() -> void:
-	get_tree().paused = false
-	get_tree().reload_current_scene()
+	var scene_tree := Engine.get_main_loop() as SceneTree
+
+	if scene_tree == null:
+		push_error("Restart failed: SceneTree not available.")
+		return
+
+	if scene_tree.current_scene == null:
+		push_error("Restart failed: No current scene.")
+		return
+
+	scene_tree.paused = false
+	scene_tree.call_deferred("reload_current_scene")
 
 
 # DEVELOPER ADMIN PANEL
@@ -621,7 +630,14 @@ func create_debug_admin_panel() -> void:
 	if not OS.has_feature("debug"):
 		return
 
-	var current_scene := get_tree().current_scene
+	if not is_inside_tree():
+		return
+
+	var tree := get_tree()
+	if tree == null:
+		return
+
+	var current_scene := tree.current_scene
 	if current_scene == null:
 		return
 
@@ -810,3 +826,26 @@ func set_player_level(level: int) -> void:
 
 func upgrade_critical_strike() -> void:
 	critical_hit_chance = minf(critical_hit_chance + 0.05, 1.0)
+
+
+# Range indicator shows AUTO-TARGET ACQUISITION range, not maximum arrow travel.
+func get_basic_attack_range() -> float:
+	return Auto_fire_range * attack_range_multiplier
+
+func is_basic_range_indicator_applicable() -> bool:
+	return auto_fire_enabled
+
+func try_spend_dodge_energy() -> bool:
+	if dodge_energy < dodge_energy_cost:
+		return false
+
+	dodge_energy -= dodge_energy_cost
+	return true
+
+
+func get_dodge_energy_percent() -> float:
+	return clampf(
+		dodge_energy / maxf(max_dodge_energy, 1.0),
+		0.0,
+		1.0
+	)

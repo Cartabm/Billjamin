@@ -29,7 +29,7 @@ func _ready() -> void:
 
 	hit_query = PhysicsShapeQueryParameters3D.new()
 	hit_query.shape = hit_shape
-	hit_query.collision_mask = 3
+	hit_query.collision_mask = 2
 	hit_query.collide_with_bodies = true
 	hit_query.collide_with_areas = false
 	hit_query.exclude = [get_rid()]
@@ -102,7 +102,6 @@ func _physics_process(delta: float) -> void:
 		return
 
 	global_position = start + motion * safe_fraction
-	has_hit = true
 	queue_free()
 
 

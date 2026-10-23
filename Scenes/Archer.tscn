@@ -7,9 +7,9 @@ vertex_color_use_as_albedo = true
 
 [node name="Billjamin_Archer_V5" unique_id=372439789 instance=ExtResource("1_hgo2b")]
 
-[node name="Skeleton3D" parent="." index="0" unique_id=1977351296]
+[node name="Skeleton3D" parent="." index="0" unique_id=1971349575]
 bones/3/rotation = Quaternion(-0.031757195, -0.014472586, 0.41444066, 0.909407)
 bones/6/rotation = Quaternion(-0.031757195, 0.014472586, -0.41444066, 0.909407)
 
-[node name="Archer_Mesh" parent="Skeleton3D" index="0" unique_id=1847581192]
+[node name="Archer_Mesh" parent="Skeleton3D" index="0" unique_id=1315128890]
 material_override = SubResource("StandardMaterial3D_vye6g")

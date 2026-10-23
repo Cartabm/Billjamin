@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://n0427h3733is"]
+
+[ext_resource type="Texture2D" uid="uid://cpc6avpbpov2x" path="res://Assets/Items/Icons/iron_chestplate.jpg" id="1_o3xng"]
+[ext_resource type="Script" uid="uid://78ng4d2uyo2" path="res://Items/ItemData.gd" id="2_drx1b"]
+[ext_resource type="Script" uid="uid://y1om1n1nfb2y" path="res://Items/ItemStat.gd" id="3_jg7rx"]
+
+[sub_resource type="Resource" id="Resource_wm2od"]
+script = ExtResource("3_jg7rx")
+stat_id = "armor"
+value = 25.0
+
+[sub_resource type="Resource" id="Resource_5hx5q"]
+script = ExtResource("3_jg7rx")
+stat_id = "max_health"
+value = 10.0
+
+[resource]
+script = ExtResource("2_drx1b")
+item_name = "Iron Chestplate"
+description = "a basic chest"
+icon = ExtResource("1_o3xng")
+stats = Array[ExtResource("3_jg7rx")]([SubResource("Resource_wm2od"), SubResource("Resource_5hx5q")])

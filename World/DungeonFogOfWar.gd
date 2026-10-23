@@ -23,7 +23,7 @@ func setup(dungeon_generator: Node3D) -> void:
 		fog_tile.mesh = mesh
 
 		var material := StandardMaterial3D.new()
-		material.albedo_color = Color(0.0, 0.0, 0.0, unexplored_opacity)
+		material.albedo_color = Color(0.12, 0.14, 0.17, unexplored_opacity)
 		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		material.cull_mode = BaseMaterial3D.CULL_DISABLED

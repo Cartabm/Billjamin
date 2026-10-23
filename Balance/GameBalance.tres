@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="EnemyBalanceProfile" format=3 uid="uid://c3pt4ucscnei7"]
+
+[ext_resource type="Script" uid="uid://drngm7g4pvvgh" path="res://Scripts/EnemyBalanceProfile.gd" id="1_g5lgh"]
+
+[resource]
+script = ExtResource("1_g5lgh")
+metadata/_custom_type_script = "uid://drngm7g4pvvgh"
